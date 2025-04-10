@@ -21,6 +21,11 @@ void dae::RenderComponent::SetTexture(const std::string& filename, SDL_Rect box)
 	m_Box = box;
 }
 
+SDL_Rect dae::RenderComponent::GetBox()
+{
+	return m_Box;
+}
+
 void dae::RenderComponent::Render()
 {
 	const auto& pos = BaseComponent::GetOwner()->GetWorldTransform().GetPosition();

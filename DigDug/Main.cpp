@@ -25,6 +25,7 @@
 #include "Suicide.h"
 #include "Pickup.h"
 #include "RockComponent.h"
+#include "HallwaysComponent.h"
 
 void InitializeCommands(dae::InputManager& input)
 {
@@ -106,6 +107,11 @@ void SetupLevel(dae::Scene& scene) {
 			scene.Add(go);
 		}
 	}
+	auto go = std::make_shared<dae::GameObject>();
+	go->AddComponent<dae::HallwaysComponent>(*go.get(), width, height);
+	go->GetComponent<dae::HallwaysComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(163, 117, 8, 8));
+	scene.Add(go);
+
 }
 
 void load()
@@ -117,20 +123,6 @@ void load()
 	auto& input = dae::InputManager::GetInstance();
 
 	InitializeCommands(input);
-
-	auto go = std::make_shared<dae::GameObject>();
-	go->AddComponent<dae::RenderComponent>(*go.get());
-	go->GetComponent<dae::RenderComponent>()->SetTexture("background.tga");
-	scene.Add(go);
-
-
-
-	go = std::make_shared<dae::GameObject>();
-	go->AddComponent<dae::RenderComponent>(*go.get());
-	go->GetComponent<dae::RenderComponent>()->SetTexture("logo.tga");
-	go->SetPosition(216, 180);
-	scene.Add(go);
-
 
 	//Parent of player info
 	auto ScoreBoardParentGo = std::make_shared<dae::GameObject>();
@@ -146,29 +138,24 @@ void load()
 	infoGo->SetPosition(0.f, 10.f);
 	scene.Add(infoGo);
 
+	
+	SetupLevel(scene);
 	//Player setup
 	int pos[2]{ 170,130 };
-	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", false,input, scene, smallFont, ScoreBoardParentGo);
+	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", false, input, scene, smallFont, ScoreBoardParentGo);
 	//int pos2[2]{ 140,100 };
 	//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, input, scene, smallFont, ScoreBoardParentGo);
-	SetupLevel(scene);
 
 	//Gameobject for the fps
-	go = std::make_shared<dae::GameObject>();
-	go->AddComponent<dae::TextComponent>(*go.get(), "here", font);
+	auto go = std::make_shared<dae::GameObject>();
+	go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
 	go->AddComponent<dae::FPSComponent>(*go.get());
 	go->GetComponent<dae::FPSComponent>()->SetToWriteComponent(go->GetComponent<dae::TextComponent>());
 	scene.Add(go);
 
-	go = std::make_shared<dae::GameObject>();
-	go->AddComponent<dae::TextComponent>(*go.get(), "Programming 4 Assignment", font);
-	go->SetPosition(80, 20);
-	scene.Add(go);
 }
 
 int main(int, char* []) {
-
-
 	dae::Minigin engine("../Data/");
 	engine.Run(load);
 	return 0;

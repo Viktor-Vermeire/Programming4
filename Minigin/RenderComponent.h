@@ -12,6 +12,7 @@ namespace dae {
         RenderComponent(GameObject& gameObject);
         void SetTexture(const std::string& filename);
         void SetTexture(const std::string& filename, SDL_Rect box);
+        SDL_Rect GetBox();
         void Render() override;
     private:
         std::shared_ptr<Texture2D> m_Texture{};
