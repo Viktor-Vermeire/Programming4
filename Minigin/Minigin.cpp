@@ -9,8 +9,11 @@
 #include "SceneManager.h"
 #include "Renderer.h"
 #include "ResourceManager.h"
+#include <chrono>
 
 SDL_Window* g_window{};
+
+long long dae::Minigin::DELTATIME = 0;
 
 void PrintSDLVersion()
 {
@@ -40,7 +43,7 @@ void PrintSDLVersion()
 		version.major, version.minor, version.patch);
 }
 
-dae::Minigin::Minigin(const std::filesystem::path& dataPath)
+dae::Minigin::Minigin(const std::string &dataPath)
 {
 	PrintSDLVersion();
 	
@@ -57,12 +60,14 @@ dae::Minigin::Minigin(const std::filesystem::path& dataPath)
 		480,
 		SDL_WINDOW_OPENGL
 	);
+	HDC screen = GetDC(nullptr);
+	m_RefreshRate = GetDeviceCaps(screen, VREFRESH);
 	if (g_window == nullptr) 
 	{
 		throw std::runtime_error(std::string("SDL_CreateWindow Error: ") + SDL_GetError());
 	}
-
 	Renderer::GetInstance().Init(g_window);
+
 	ResourceManager::GetInstance().Init(dataPath);
 }
 
@@ -76,18 +81,33 @@ dae::Minigin::~Minigin()
 
 void dae::Minigin::Run(const std::function<void()>& load)
 {
+	
 	load();
-
+	m_CurrentTime = std::chrono::system_clock::now();
 	auto& renderer = Renderer::GetInstance();
 	auto& sceneManager = SceneManager::GetInstance();
 	auto& input = InputManager::GetInstance();
 
+	//input.InitializeCommands();
 	// todo: this update loop could use some work.
 	bool doContinue = true;
 	while (doContinue)
 	{
+		UpdateDeltaTime();
+		if (DELTATIME < 1000.f / m_RefreshRate) {
+			Sleep(static_cast<DWORD>(1000.f / m_RefreshRate - DELTATIME));
+			DELTATIME += 1000 / m_RefreshRate - DELTATIME;
+		}
 		doContinue = input.ProcessInput();
 		sceneManager.Update();
 		renderer.Render();
+		DELTATIME = 0;
 	}
+}
+
+void dae::Minigin::UpdateDeltaTime()
+{
+	auto tempTime = std::chrono::system_clock::now();
+	DELTATIME += std::chrono::duration_cast<std::chrono::milliseconds>(tempTime - m_CurrentTime).count();
+	m_CurrentTime = std::move(tempTime);
 }

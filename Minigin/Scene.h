@@ -10,10 +10,12 @@ namespace dae
 	public:
 		void Add(std::shared_ptr<GameObject> object);
 		void Remove(std::shared_ptr<GameObject> object);
+
 		void RemoveAll();
 
 		void Update();
 		void Render() const;
+		std::string GetName();
 
 		~Scene();
 		Scene(const Scene& other) = delete;
