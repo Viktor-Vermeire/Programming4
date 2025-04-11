@@ -24,6 +24,7 @@
 #include "Move.h"
 #include "Suicide.h"
 #include "Pickup.h"
+#include "DiggingComponent.h"
 #include "RockComponent.h"
 #include "HallwaysComponent.h"
 
@@ -45,7 +46,7 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::Pickup>(SDL_SCANCODE_X, false, 100);
 }
 
-void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::string name, bool usesGamePad,dae::InputManager& input, dae::Scene& scene, std::shared_ptr<dae::Font> font, std::shared_ptr<dae::GameObject> scoreBoardGo) {
+void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::string name, bool usesGamePad,dae::InputManager& input, dae::Scene& scene, std::shared_ptr<dae::Font> font, std::shared_ptr<dae::GameObject> scoreBoardGo, dae::GameObject* hallways) {
 	auto go = std::make_shared<dae::GameObject>();
 
 	auto PlayerLivesGo = std::make_shared<dae::GameObject>();
@@ -76,6 +77,7 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 		playerComp->AddObserver(scoreInfoComp);
 		healthComp->AddObserver(livesInfoComp);
 	}
+	go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
 	//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
 	scene.Add(go);
 	input.AddGameActor(go.get());
@@ -83,7 +85,23 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 	scene.Add(PlayerScoreGo);
 }
 
-void SetupLevel(dae::Scene& scene) {
+void SetupHallwaySources(dae::GameObject* go) {
+	go->GetComponent<dae::HallwaysComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png");
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::TOPCLOSED, SDL_Rect(1, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::BOTTOMCLOSED, SDL_Rect(19, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::LEFTCLOSED, SDL_Rect(37, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::RIGHTCLOSED, SDL_Rect(55, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::VERTICALTHROUGH, SDL_Rect(73, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::HORIZONTALTHROUGH, SDL_Rect(91, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::LEFTTOPCORNER, SDL_Rect(109, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::RIGHTTOPCORNER, SDL_Rect(127, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::LEFTBOTTOMCORNER, SDL_Rect(145, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::RIGHTBOTTOMCORNER, SDL_Rect(163, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::CLEARED, SDL_Rect(163, 117, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::FILLED, SDL_Rect(181, 99, 16, 16));
+}
+
+dae::GameObject* SetupLevelAndReturnHallwaysObject(dae::Scene& scene) {
 	int width, height;
 	SDL_GetWindowSize(dae::Renderer::GetInstance().GetSDLWindow(), &width, &height);
 	int layerthickness = height / 5;
@@ -107,12 +125,15 @@ void SetupLevel(dae::Scene& scene) {
 			scene.Add(go);
 		}
 	}
+
 	auto go = std::make_shared<dae::GameObject>();
 	go->AddComponent<dae::HallwaysComponent>(*go.get(), width, height);
-	go->GetComponent<dae::HallwaysComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(163, 117, 8, 8));
+	SetupHallwaySources(go.get());
 	scene.Add(go);
-
+	return go.get();
 }
+
+
 
 void load()
 {
@@ -139,10 +160,10 @@ void load()
 	scene.Add(infoGo);
 
 	
-	SetupLevel(scene);
+	auto hallways = SetupLevelAndReturnHallwaysObject(scene);
 	//Player setup
 	int pos[2]{ 170,130 };
-	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", false, input, scene, smallFont, ScoreBoardParentGo);
+	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", false, input, scene, smallFont, ScoreBoardParentGo, hallways);
 	//int pos2[2]{ 140,100 };
 	//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, input, scene, smallFont, ScoreBoardParentGo);
 
