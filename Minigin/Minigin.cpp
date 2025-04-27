@@ -12,6 +12,7 @@
 #include <chrono>
 #include "ServiceLocator.h"
 #include "SDLSoundSystem.h"
+#include "filesystem"
 
 SDL_Window* g_window{};
 
@@ -45,11 +46,11 @@ void PrintSDLVersion()
 		version.major, version.minor, version.patch);
 }
 
-dae::Minigin::Minigin(const std::string &dataPath)
+dae::Minigin::Minigin(const std::filesystem::path &dataPath)
 {
 	PrintSDLVersion();
 	
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) 
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) 
 	{
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
 	}
@@ -71,6 +72,7 @@ dae::Minigin::Minigin(const std::string &dataPath)
 	Renderer::GetInstance().Init(g_window);
 
 	ResourceManager::GetInstance().Init(dataPath);
+	ServiceLocator::register_SoundSystem(std::make_unique<SDLSoundSystem>(dataPath));
 }
 
 dae::Minigin::~Minigin()
@@ -83,7 +85,7 @@ dae::Minigin::~Minigin()
 
 void dae::Minigin::Run(const std::function<void()>& load)
 {
-	ServiceLocator::register_SoundSystem(std::make_unique<SDLSoundSystem>());
+	
 	load();
 	m_CurrentTime = std::chrono::system_clock::now();
 	auto& renderer = Renderer::GetInstance();

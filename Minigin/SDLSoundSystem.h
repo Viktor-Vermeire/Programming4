@@ -4,21 +4,22 @@
 #include <thread>
 #include <SDL_mixer.h> 
 #include "vector"
+#include "filesystem"
 
 namespace dae {
+	class SDLSoundSystemImpl;
 	class SDLSoundSystem : public SoundSystem
 	{
 	public:
-		SDLSoundSystem() = default;
+		SDLSoundSystem(const std::filesystem::path& dataPath);
 		
 		void AddEffect(std::vector<const char*> effects) override;
 		void play(const unsigned short id, const float volume) override;
 		void CleanupSoundThreads() override;
 		
 	private:
-		void playSound(const unsigned short id, const float volume);
-		std::vector<std::unique_ptr<Mix_Chunk>> m_Effects;
-		std::vector<std::jthread> threads;
+		std::unique_ptr<SDLSoundSystemImpl> m_SDLSoundSystemImpl;
+		
 
 	};
 }

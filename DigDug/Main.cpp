@@ -29,6 +29,7 @@
 #include "RockComponent.h"
 #include "HallwaysComponent.h"
 #include "ServiceLocator.h"
+namespace fs = std::filesystem;
 
 void InitializeCommands(dae::InputManager& input)
 {
@@ -166,14 +167,29 @@ void load()
 	infoGo->AddComponent<dae::TextComponent>(*infoGo.get(), "Use WASD to move DigDug, C to inflict damage, Z and X to pick up points", smallFont);
 	infoGo->SetPosition(0.f, 10.f);
 	scene.Add(infoGo);
+	infoGo = std::make_shared<dae::GameObject>();
+	infoGo->SetParent(ScoreBoardParentGo.get());
+	infoGo->AddComponent<dae::TextComponent>(*infoGo.get(), "Press F or A on controller to play sound.", smallFont);
+	infoGo->SetPosition(0.f, -44.f);
+	scene.Add(infoGo);
+	infoGo = std::make_shared<dae::GameObject>();
+	infoGo->SetParent(ScoreBoardParentGo.get());
+	infoGo->AddComponent<dae::TextComponent>(*infoGo.get(), "(Currently doesn't play sounds due to soundfile not being found in SDL_LOADWAV.", smallFont);
+	infoGo->SetPosition(0.f, -32.f);
+	scene.Add(infoGo);
+	infoGo = std::make_shared<dae::GameObject>();
+	infoGo->SetParent(ScoreBoardParentGo.get());
+	infoGo->AddComponent<dae::TextComponent>(*infoGo.get(), "However Threads are created and closed accordingly.)", smallFont);
+	infoGo->SetPosition(0.f, -20.f);
+	scene.Add(infoGo);
 
 	
 	auto hallways = SetupLevelAndReturnHallwaysObject(scene);
 	//Player setup
 	int pos[2]{ 170,130 };
-	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", false, input, scene, smallFont, ScoreBoardParentGo, hallways);
-	//int pos2[2]{ 140,100 };
-	//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, input, scene, smallFont, ScoreBoardParentGo);
+	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
+	int pos2[2]{ 140,100 };
+	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, input, scene, smallFont, ScoreBoardParentGo, hallways);
 
 	//Gameobject for the fps
 	auto go = std::make_shared<dae::GameObject>();
@@ -186,7 +202,11 @@ void load()
 }
 
 int main(int, char* []) {
-	dae::Minigin engine("../Data/");
+	fs::path data_location = "./Data/";
+	if (!fs::exists(data_location))
+		data_location = "../Data/";
+
+	dae::Minigin engine(data_location);
 	engine.Run(load);
 	return 0;
 }
