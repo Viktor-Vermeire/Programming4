@@ -155,6 +155,7 @@
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
     <ClCompile Include="PlayerInfoComponent.cpp" />
+    <ClCompile Include="PlaySound.cpp" />
     <ClCompile Include="RockComponent.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
     <ClCompile Include="Suicide.cpp" />
@@ -167,9 +168,44 @@
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="PlayerInfoComponent.h" />
+    <ClInclude Include="PlaySound.h" />
     <ClInclude Include="RockComponent.h" />
     <ClInclude Include="RotatorComponent.h" />
     <ClInclude Include="Suicide.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Data\DigDug_SoundEffects\boss_fygar_firebreath.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\coin_credit.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed1.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed2.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed3.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed4.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed5.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_moving.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_pop.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_touched.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\extra_life.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\fygar_fire.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\island_emerging.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\life_lost.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\marble_travel.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\powerup_item.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\pump.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\pump_fire.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\raygun_rain.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\result_screen_beep.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\rock_drop.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\rock_thud.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\title_screen_thud.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\to_the_mooooon.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\whoosh1.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\whoosh2.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\whoosh3.wav" />
+    <Media Include="..\Data\fireball.mp3" />
+    <Media Include="..\Data\fireball.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Data\DigDug_SoundEffects\Loop Points.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

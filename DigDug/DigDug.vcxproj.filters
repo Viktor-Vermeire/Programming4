@@ -60,6 +60,9 @@
     <ClCompile Include="HallwaysComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
+    <ClCompile Include="PlaySound.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Move.h">
@@ -92,5 +95,102 @@
     <ClInclude Include="HallwaysComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="PlaySound.h">
+      <Filter>Header Files\Commands</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Data\DigDug_SoundEffects\boss_fygar_firebreath.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\coin_credit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed3.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed4.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_killed5.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_moving.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_pop.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\enemy_touched.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\extra_life.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\fygar_fire.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\island_emerging.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\life_lost.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\marble_travel.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\powerup_item.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\pump.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\pump_fire.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\raygun_rain.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\result_screen_beep.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\rock_drop.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\rock_thud.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\title_screen_thud.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\to_the_mooooon.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\whoosh1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\whoosh2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\whoosh3.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\fireball.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\fireball.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\Data\DigDug_SoundEffects\Loop Points.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

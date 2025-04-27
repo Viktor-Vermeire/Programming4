@@ -10,6 +10,8 @@
 #include "Renderer.h"
 #include "ResourceManager.h"
 #include <chrono>
+#include "ServiceLocator.h"
+#include "SDLSoundSystem.h"
 
 SDL_Window* g_window{};
 
@@ -81,12 +83,13 @@ dae::Minigin::~Minigin()
 
 void dae::Minigin::Run(const std::function<void()>& load)
 {
-	
+	ServiceLocator::register_SoundSystem(std::make_unique<SDLSoundSystem>());
 	load();
 	m_CurrentTime = std::chrono::system_clock::now();
 	auto& renderer = Renderer::GetInstance();
 	auto& sceneManager = SceneManager::GetInstance();
 	auto& input = InputManager::GetInstance();
+	
 
 	//input.InitializeCommands();
 	// todo: this update loop could use some work.
@@ -100,6 +103,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		}
 		doContinue = input.ProcessInput();
 		sceneManager.Update();
+		ServiceLocator::get_SoundSystem().CleanupSoundThreads();
 		renderer.Render();
 		DELTATIME = 0;
 	}

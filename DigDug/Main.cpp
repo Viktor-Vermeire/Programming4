@@ -24,9 +24,11 @@
 #include "Move.h"
 #include "Suicide.h"
 #include "Pickup.h"
+#include "PlaySound.h"
 #include "DiggingComponent.h"
 #include "RockComponent.h"
 #include "HallwaysComponent.h"
+#include "ServiceLocator.h"
 
 void InitializeCommands(dae::InputManager& input)
 {
@@ -44,6 +46,8 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::Pickup>(SDL_SCANCODE_Z, false, 10);
 	input.AddCommand<dae::Pickup>(8192, true, 100);
 	input.AddCommand<dae::Pickup>(SDL_SCANCODE_X, false, 100);
+	input.AddCommand<dae::PlaySound>(SDL_SCANCODE_F, false, 0);
+	input.AddCommand<dae::PlaySound>(4096, true, 0);
 }
 
 void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::string name, bool usesGamePad,dae::InputManager& input, dae::Scene& scene, std::shared_ptr<dae::Font> font, std::shared_ptr<dae::GameObject> scoreBoardGo, dae::GameObject* hallways) {
@@ -133,6 +137,10 @@ dae::GameObject* SetupLevelAndReturnHallwaysObject(dae::Scene& scene) {
 	return go.get();
 }
 
+void SetupSound() {
+	auto& soundsystem = dae::ServiceLocator::get_SoundSystem();
+	soundsystem.AddEffect({ "fireball.mp3" });
+}
 
 
 void load()
@@ -173,6 +181,7 @@ void load()
 	go->AddComponent<dae::FPSComponent>(*go.get());
 	go->GetComponent<dae::FPSComponent>()->SetToWriteComponent(go->GetComponent<dae::TextComponent>());
 	scene.Add(go);
+	SetupSound();
 
 }
 

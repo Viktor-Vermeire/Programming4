@@ -23,6 +23,8 @@ mono_crash.*
 [Rr]eleases/
 x64/
 x86/
+Minigin/x64
+DigDug/x64
 [Ww][Ii][Nn]32/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/

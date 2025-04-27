@@ -99,7 +99,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\SDL2_mixer\include;%(AdditionalIncludeDirectories);$(SolutionDir)3rdParty\imgui-1.91.8</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -112,6 +112,8 @@
     <Lib>
       <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PostBuildEvent />
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -120,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\imgui-1.91.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\SDL2_mixer\include;%(AdditionalIncludeDirectories);$(SolutionDir)3rdParty\imgui-1.91.8</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -131,14 +133,11 @@
       <AdditionalDependencies>opengl32.lib;SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent />
-    <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)3rdParty\SDL2\lib\x64\SDL2.dll /R /Y
-xcopy $(SolutionDir)3rdParty\SDL2_image\lib\x64\*.dll /R /Y
-xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
     <Lib>
       <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -149,7 +148,7 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdPartySDL2_mixer\include;%(AdditionalIncludeDirectories);$(SolutionDir)3rdParty\imgui-1.91.8</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -164,6 +163,8 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
     <Lib>
       <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PostBuildEvent />
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -174,7 +175,7 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)3rdParty\imgui-1.91.8;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)3rdPartySDL2_mixer\include;%(AdditionalIncludeDirectories);$(SolutionDir)3rdParty\imgui-1.91.8</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -187,14 +188,11 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent />
-    <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)3rdParty\SDL2\lib\x64\SDL2.dll /R /Y
-xcopy $(SolutionDir)3rdParty\SDL2_image\lib\x64\*.dll /R /Y
-xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
-    </PostBuildEvent>
+    <PostBuildEvent />
     <Lib>
       <AdditionalDependencies>xinput.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <PostBuildEvent />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\3rdParty\imgui-1.91.8\backends\imgui_impl_opengl3.h" />
@@ -224,7 +222,10 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SDLSoundSystem.h" />
+    <ClInclude Include="ServiceLocator.h" />
     <ClInclude Include="Singleton.h" />
+    <ClInclude Include="SoundSystem.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
@@ -251,6 +252,7 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SDLSoundSystem.cpp" />
     <ClCompile Include="TextComponent.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Transform.cpp" />
@@ -259,6 +261,9 @@ xcopy $(SolutionDir)3rdParty\SDL2_ttf\lib\x64\*.dll /R /Y</Command>
     <Image Include="..\Data\DigDug_General_Sprites.png" />
     <Image Include="..\Data\DigDug_General_Sprites_1.png" />
     <Image Include="..\Data\DigDug_Tiles_Logos_Text.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\Data\fireball.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
