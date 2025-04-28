@@ -73,8 +73,9 @@ namespace dae {
 		
 		for (int looper{0}; looper < effects.size(); ++looper) {
 			const auto fullPath = m_DataPath / effects.at(looper);
-			 //HERE IS THE ISSUE NO FILE IS FOUND DESPITE IT'S PRESENCE
-			m_Effects.push_back(Mix_LoadWAV(fullPath.generic_string().c_str()));
+			 //HERE IS THE ISSUE NO FILE IS FOUND DESPITE IT'S 
+			auto* thing = Mix_LoadWAV(fullPath.generic_string().c_str());
+			m_Effects.push_back(thing);
 		}
 	}
 }

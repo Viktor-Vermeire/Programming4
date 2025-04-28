@@ -13,6 +13,7 @@
 #include "ServiceLocator.h"
 #include "SDLSoundSystem.h"
 #include "filesystem"
+#include "iostream"
 
 SDL_Window* g_window{};
 
@@ -53,6 +54,9 @@ dae::Minigin::Minigin(const std::filesystem::path &dataPath)
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) 
 	{
 		throw std::runtime_error(std::string("SDL_Init Error: ") + SDL_GetError());
+	}
+	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+		std::cerr << "SDL_mixer could not initialize! " << Mix_GetError() << std::endl;
 	}
 
 	g_window = SDL_CreateWindow(
