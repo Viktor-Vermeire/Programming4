@@ -26,13 +26,7 @@ void dae::GameObject::Update(){
 void dae::GameObject::Render()
 {
 	if (m_IsWorldTransformOutdated) {
-		if (m_Parent == nullptr) {
-			m_WorldTransform.SetPosition((m_LocalTransform.GetPosition().x), (m_LocalTransform.GetPosition().y), 0.0f);
-		}
-		else {
-			m_WorldTransform.SetPosition((m_LocalTransform.GetPosition().x + m_Parent->GetWorldTransform().GetPosition().x), (m_LocalTransform.GetPosition().y + m_Parent->GetWorldTransform().GetPosition().y), 0.0f);
-		}
-		m_IsWorldTransformOutdated = false;
+		UpdateWorldTransform();
 	}
 	for (const auto& component : m_Components) {
 		component->Render();
@@ -81,6 +75,8 @@ void dae::GameObject::RemoveChild(GameObject* gameObject)
 
 dae::Transform dae::GameObject::GetWorldTransform()
 {
+	if (m_IsWorldTransformOutdated)
+		UpdateWorldTransform();
 	return m_WorldTransform;
 }
 
@@ -107,4 +103,15 @@ void dae::GameObject::SetWorldTransformOutdated()
 		m_Children.at(looper)->SetWorldTransformOutdated();
 	}
 
+}
+
+void dae::GameObject::UpdateWorldTransform()
+{
+	if (m_Parent == nullptr) {
+		m_WorldTransform.SetPosition((m_LocalTransform.GetPosition().x), (m_LocalTransform.GetPosition().y), 0.0f);
+	}
+	else {
+		m_WorldTransform.SetPosition((m_LocalTransform.GetPosition().x + m_Parent->GetWorldTransform().GetPosition().x), (m_LocalTransform.GetPosition().y + m_Parent->GetWorldTransform().GetPosition().y), 0.0f);
+	}
+	m_IsWorldTransformOutdated = false;
 }

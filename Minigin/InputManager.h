@@ -3,15 +3,16 @@
 #include "Command.h"
 #include "vector"
 #include "memory"
+#include "Gamepad.h"
 
 namespace dae
 {
-	class Gamepad;
+	
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
 		bool ProcessInput();
-		void AddGamepad(Gamepad* gamepad);
+		void AddGamepad(std::unique_ptr<Gamepad> gamepad);
 		void AddGameActor(GameObject* gameActor);
 		int GetGameActorSize();
 
@@ -22,7 +23,7 @@ namespace dae
 		}
 	private:
 		std::vector<std::unique_ptr<Command>> m_Commands;
-		std::vector<Gamepad*> m_GamePads;
+		std::vector<std::unique_ptr<Gamepad>> m_GamePads;
 		std::vector<GameObject*> m_GameActors;
 	};
 

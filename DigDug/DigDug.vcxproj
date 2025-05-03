@@ -152,6 +152,7 @@
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Move.cpp" />
+    <ClCompile Include="MovementComponent.cpp" />
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
     <ClCompile Include="PlayerInfoComponent.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="HallwaysComponent.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="Move.h" />
+    <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="PlayerInfoComponent.h" />

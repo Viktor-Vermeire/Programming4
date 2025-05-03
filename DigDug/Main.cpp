@@ -29,18 +29,19 @@
 #include "RockComponent.h"
 #include "HallwaysComponent.h"
 #include "ServiceLocator.h"
+#include "AnimationComponent.h"
 namespace fs = std::filesystem;
 
 void InitializeCommands(dae::InputManager& input)
 {
-	input.AddCommand<dae::Move>(1, true, std::pair<float, float>(0.f, -1.f));
-	input.AddCommand<dae::Move>(2, true, std::pair<float, float>(0.f, 1.f));
-	input.AddCommand<dae::Move>(4, true, std::pair<float, float>(-1.f, 0.f));
-	input.AddCommand<dae::Move>(8, true, std::pair<float, float>(1.f, 0.f));
-	input.AddCommand<dae::Move>(SDL_SCANCODE_W, false, std::pair<float, float>(0.f, -2.f));
-	input.AddCommand<dae::Move>(SDL_SCANCODE_S, false, std::pair<float, float>(0.f, 2.f));
-	input.AddCommand<dae::Move>(SDL_SCANCODE_A, false, std::pair<float, float>(-2.f, 0.f));
-	input.AddCommand<dae::Move>(SDL_SCANCODE_D, false, std::pair<float, float>(2.f, 0.f));
+	input.AddCommand<dae::Move>(1, true, dae::AnimationComponent::UP);
+	input.AddCommand<dae::Move>(2, true, dae::AnimationComponent::DOWN);
+	input.AddCommand<dae::Move>(4, true, dae::AnimationComponent::LEFT);
+	input.AddCommand<dae::Move>(8, true, dae::AnimationComponent::RIGHT);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_W, false, dae::AnimationComponent::UP);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_S, false, dae::AnimationComponent::DOWN);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_A, false, dae::AnimationComponent::LEFT);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_D, false, dae::AnimationComponent::RIGHT);
 	input.AddCommand<dae::Suicide>(32768, true);
 	input.AddCommand<dae::Suicide>(SDL_SCANCODE_C, false);
 	input.AddCommand<dae::Pickup>(16384, true, 10);
@@ -65,11 +66,18 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 
 	go = std::make_shared<dae::GameObject>();
 	go->AddComponent<dae::RenderComponent>(*go.get());
+
+	//MovementComponent setup
+	go->AddComponent<dae::MovementComponent>(*go.get());
+	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
+	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
+	go->GetComponent<dae::MovementComponent>()->SetHallways(hallways);
+
 	go->GetComponent<dae::RenderComponent>()->SetTexture(texturePath, textureSrcRect);
 	go->SetPosition(startPos[0], startPos[1]);
-	dae::Gamepad* gamepad = new dae::Gamepad(input.GetGameActorSize());
+	std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
 	gamepad->SetUsed(usesGamePad);
-	input.AddGamepad(gamepad);
+	input.AddGamepad(std::move(gamepad));
 	go->AddComponent<dae::PlayerComponent>(*go.get(), name);
 	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8);
 	auto playerComp = go->GetComponent<dae::PlayerComponent>();
@@ -82,7 +90,7 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 		playerComp->AddObserver(scoreInfoComp);
 		healthComp->AddObserver(livesInfoComp);
 	}
-	go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
+	//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
 	//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
 	scene.Add(go);
 	input.AddGameActor(go.get());
@@ -112,28 +120,29 @@ dae::GameObject* SetupLevelAndReturnHallwaysObject(dae::Scene& scene) {
 	int layerthickness = height / 5;
 	for (int rowPos{}; rowPos < height; rowPos += 8) {
 		for (int colPos{}; colPos < width; colPos += 8) {
-			std::shared_ptr<dae::GameObject> go = std::make_shared<dae::GameObject>();
-			go->AddComponent<dae::RenderComponent>(*go.get());
+			std::shared_ptr<dae::GameObject> GroundObject = std::make_shared<dae::GameObject>();
+			GroundObject->AddComponent<dae::RenderComponent>(*GroundObject.get());
 			if (rowPos < layerthickness)
-				go->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(73, 14, 8, 8));
+				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(73, 14, 8, 8));
 			else if (rowPos < layerthickness * 2)
-				go->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(73, 32, 8, 8));
+				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(73, 32, 8, 8));
 			else if (rowPos < layerthickness * 3)
-				go->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 14, 8, 8));
+				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 14, 8, 8));
 			else if (rowPos < layerthickness * 4)
-				go->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 23, 8, 8));
+				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 23, 8, 8));
 			else
-				go->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 32, 8, 8));
+				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 32, 8, 8));
 			
-			go->AddComponent<dae::RockComponent>(*go.get());
-			go->SetPosition(colPos, rowPos);
-			scene.Add(go);
+			GroundObject->AddComponent<dae::RockComponent>(*GroundObject.get());
+			GroundObject->SetPosition(colPos, rowPos);
+			scene.Add(GroundObject);
 		}
 	}
 
 	auto go = std::make_shared<dae::GameObject>();
 	go->AddComponent<dae::HallwaysComponent>(*go.get(), width, height);
 	SetupHallwaySources(go.get());
+	go->GetComponent<dae::HallwaysComponent>()->ClearSky();
 	scene.Add(go);
 	return go.get();
 }
@@ -186,9 +195,9 @@ void load()
 	
 	auto hallways = SetupLevelAndReturnHallwaysObject(scene);
 	//Player setup
-	int pos[2]{ 170,130 };
+	int pos[2]{ 81,81 };
 	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
-	int pos2[2]{ 140,100 };
+	int pos2[2]{ 161,81 };
 	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, input, scene, smallFont, ScoreBoardParentGo, hallways);
 
 	//Gameobject for the fps

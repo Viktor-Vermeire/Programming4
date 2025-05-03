@@ -17,7 +17,7 @@ namespace dae
 		Minigin(Minigin&& other) = delete;
 		Minigin& operator=(const Minigin& other) = delete;
 		Minigin& operator=(Minigin&& other) = delete;
-		static long long DELTATIME;
+		static float DELTATIME;
 		
 	private:
 		int m_RefreshRate;

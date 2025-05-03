@@ -67,6 +67,7 @@ namespace dae
 		//void CleanupChildren();
 		void CleanupComponents();
 		void SetWorldTransformOutdated();
+		void UpdateWorldTransform();
 		
 
 		GameObject();

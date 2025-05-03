@@ -2,7 +2,7 @@
 #include <windows.h>
 #include "Gamepad.h"
 #include "XInput.h"
-class dae::GamePadImpl {
+class dae::Gamepad::GamePadImpl {
 public:
 	GamePadImpl() {
 
@@ -131,3 +131,8 @@ bool dae::Gamepad::IsPressed(unsigned int button) const
 {
 	return pimpl->IsPressed(button);
 }
+
+dae::Gamepad::~Gamepad() = default;
+
+dae::Gamepad::Gamepad(dae::Gamepad&&) = default;
+dae::Gamepad& dae::Gamepad::operator=(dae::Gamepad&&) = default;

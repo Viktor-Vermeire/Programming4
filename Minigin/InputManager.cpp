@@ -3,6 +3,8 @@
 #include "InputManager.h"
 #include <backends/imgui_impl_sdl2.h>
 #include "Gamepad.h"
+#include "AnimationComponent.h"
+#include "GameObject.h"
 #include "iostream"
 #include "memory"
 
@@ -39,9 +41,9 @@ bool dae::InputManager::ProcessInput()
 }
 
 
-void dae::InputManager::AddGamepad(Gamepad* gamepad)
+void dae::InputManager::AddGamepad(std::unique_ptr<Gamepad> gamepad)
 {
-	m_GamePads.emplace_back(gamepad);
+	m_GamePads.emplace_back(std::move(gamepad));
 }
 
 void dae::InputManager::AddGameActor(GameObject* gameActor)

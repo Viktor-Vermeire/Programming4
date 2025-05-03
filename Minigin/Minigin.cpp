@@ -17,7 +17,7 @@
 
 SDL_Window* g_window{};
 
-long long dae::Minigin::DELTATIME = 0;
+float dae::Minigin::DELTATIME = 0.f;
 
 void PrintSDLVersion()
 {
@@ -103,9 +103,9 @@ void dae::Minigin::Run(const std::function<void()>& load)
 	while (doContinue)
 	{
 		UpdateDeltaTime();
-		if (DELTATIME < 1000.f / m_RefreshRate) {
-			Sleep(static_cast<DWORD>(1000.f / m_RefreshRate - DELTATIME));
-			DELTATIME += 1000 / m_RefreshRate - DELTATIME;
+		if (DELTATIME < 1.f / m_RefreshRate) {
+			Sleep(static_cast<DWORD>(1.f / m_RefreshRate - DELTATIME));
+			DELTATIME += 1.f / static_cast<float>(m_RefreshRate) - DELTATIME;
 		}
 		doContinue = input.ProcessInput();
 		sceneManager.Update();
@@ -118,6 +118,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 void dae::Minigin::UpdateDeltaTime()
 {
 	auto tempTime = std::chrono::system_clock::now();
-	DELTATIME += std::chrono::duration_cast<std::chrono::milliseconds>(tempTime - m_CurrentTime).count();
+	//std::cout << static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(tempTime - m_CurrentTime).count()) / 1000.f << "\n";
+	DELTATIME += static_cast<float>(std::chrono::duration_cast<std::chrono::milliseconds>(tempTime - m_CurrentTime).count()) / 1000.f;
 	m_CurrentTime = std::move(tempTime);
 }

@@ -2,12 +2,15 @@
 #include "memory"
 namespace dae
 {
-    class GamePadImpl;
+    //class GamePadImpl;
     class Gamepad
     {
     public:
         Gamepad();
         Gamepad(int a_iIndex);
+        ~Gamepad();
+        Gamepad(Gamepad&&);
+        Gamepad& operator=(Gamepad&&);
 
         // Utility functions
         //XINPUT_STATE GetState(); // Return gamepad state
@@ -22,6 +25,7 @@ namespace dae
         bool IsUpThisFrame(unsigned int button) const;
         bool IsPressed(unsigned int button) const;
     private:
+        class GamePadImpl;
         std::unique_ptr<GamePadImpl> pimpl;
     };
 }

@@ -2,13 +2,18 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "Command.h"
+#include "AnimationComponent.h"
+#include "MovementComponent.h"
 
 namespace dae {
-	Move::Move(int inputValue,bool usingGamepad, std::pair<float, float> direction): Command(inputValue, usingGamepad), m_Direction{direction}
+	Move::Move(int inputValue,bool usingGamepad, AnimationComponent::Direction direction): Command(inputValue, usingGamepad), m_Direction{direction}
 	{
 	}
 	void Move::execute(GameObject& gameObject)
 	{
-		gameObject.SetPosition(gameObject.GetLocalTransform().GetPosition().x + m_Direction.first, gameObject.GetLocalTransform().GetPosition().y + m_Direction.second);
+		MovementComponent* component = gameObject.GetComponent<MovementComponent>();
+		if (component != nullptr) {
+			component->Move(m_Direction);
+		}
 	}
 }
