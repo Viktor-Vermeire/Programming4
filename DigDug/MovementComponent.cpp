@@ -24,27 +24,64 @@ void dae::MovementComponent::SetHallways(GameObject* hallways)
 	m_Hallways = hallways;
 }
 
+void dae::MovementComponent::ResetMovement()
+{
+	m_TimeInMovement = 0;
+	m_IsMoving = true;
+	m_WantsToMove = false;
+}
+
+bool dae::MovementComponent::WantsToMove()
+{
+	return m_WantsToMove;
+}
+
+void dae::MovementComponent::SetWantsToMove(bool value)
+{
+	m_WantsToMove = value;
+}
+
+bool dae::MovementComponent::IsRunning()
+{
+	return m_IsMoving;
+}
+
 void dae::MovementComponent::Update()
 {
-	if (!m_IsMoving)
+	/*if (!m_IsMoving)
 		return;
 	auto& localTransform = GetOwner()->GetLocalTransform().GetPosition();
+	if (m_TimeInMovement + Minigin::DELTATIME > m_TimePerMove) {
+		m_IsMoving = false; //This has to go
+		GetOwner()->SetPosition(localTransform.x + (m_CurrentMovement.x * (m_TimePerMove - m_TimeInMovement)), localTransform.y + m_CurrentMovement.y * (m_TimePerMove - m_TimeInMovement));
+		return;
+	}
+	m_TimeInMovement += Minigin::DELTATIME;
+	std::cout << "x: " << localTransform.x << "\n" << "y: " << localTransform.y << "\n";
+	GetOwner()->SetPosition(localTransform.x + (m_CurrentMovement.x * Minigin::DELTATIME), localTransform.y + (m_CurrentMovement.y * Minigin::DELTATIME));*/
+}
+
+void dae::MovementComponent::ExecuteMove()
+{
+	m_IsMoving = true;
+	auto& localTransform = GetOwner()->GetLocalTransform().GetPosition();
+	std::cout << "Time: " << Minigin::DELTATIME << "\n";
 	if (m_TimeInMovement + Minigin::DELTATIME > m_TimePerMove) {
 		m_IsMoving = false;
 		GetOwner()->SetPosition(localTransform.x + (m_CurrentMovement.x * (m_TimePerMove - m_TimeInMovement)), localTransform.y + m_CurrentMovement.y * (m_TimePerMove - m_TimeInMovement));
 		return;
 	}
 	m_TimeInMovement += Minigin::DELTATIME;
-	std::cout << "x: " << localTransform.x << "\n" << "y: " << localTransform.y << "\n";
+	//std::cout << "x: " << localTransform.x << "\n" << "y: " << localTransform.y << "\n";
 	GetOwner()->SetPosition(localTransform.x + (m_CurrentMovement.x * Minigin::DELTATIME), localTransform.y + (m_CurrentMovement.y * Minigin::DELTATIME));
 }
 
 void dae::MovementComponent::Move(dae::AnimationComponent::Direction direction)
 {
-	if (m_IsMoving)
-		return;
-	m_IsMoving = true;
-	m_TimeInMovement = 0;
+	/*if (m_IsMoving) //Should be deletable
+		return;*/
+	std::cout << "Being hit \n";
+	m_WantsToMove = true;
 	HallwaysComponent* hallways = ((m_Hallways != nullptr) ? m_Hallways->GetComponent<HallwaysComponent>() : nullptr);
 	if (hallways == nullptr)
 		return;

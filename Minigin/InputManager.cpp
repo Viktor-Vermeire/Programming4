@@ -40,6 +40,38 @@ bool dae::InputManager::ProcessInput()
 		return true;
 }
 
+bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad)
+{
+
+	const Uint8* pStates = SDL_GetKeyboardState(nullptr);
+	SDL_Event e;
+
+	for (int commandLooper{ 0 }; commandLooper < m_Commands.size(); ++commandLooper) {
+		bool gamepadUsed = gamepad->IsUsed();
+		bool gamepadCommand = m_Commands.at(commandLooper)->IsUsingGamepad();
+		if (gamepadUsed != gamepadCommand)
+			continue;
+		if (gamepad->IsUsed()) {
+			gamepad->Update();
+			if (gamepad->IsPressed(m_Commands.at(commandLooper)->GetInputValue())) {
+				m_Commands.at(commandLooper)->execute(*player);
+			}
+		}
+		else {
+			if (pStates[m_Commands.at(commandLooper)->GetInputValue()]) {
+				m_Commands.at(commandLooper)->execute(*player);
+			}
+			ImGui_ImplSDL2_ProcessEvent(&e);
+		}
+	}
+	while (SDL_PollEvent(&e)) {
+		if (e.type == SDL_QUIT) {
+			return false;
+		}
+	}
+	return true;
+}
+
 
 void dae::InputManager::AddGamepad(std::unique_ptr<Gamepad> gamepad)
 {
@@ -53,4 +85,15 @@ void dae::InputManager::AddGameActor(GameObject* gameActor)
 
 int dae::InputManager::GetGameActorSize() {
 	return static_cast<int>(m_GameActors.size());
+}
+
+bool dae::InputManager::CheckExit()
+{
+	SDL_Event e;
+	while (SDL_PollEvent(&e)) {
+		if (e.type == SDL_QUIT) {
+			return false;
+		}
+	}
+	return true;
 }

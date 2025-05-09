@@ -7,6 +7,7 @@ namespace dae
     {
     public:
         Gamepad();
+        Gamepad(const dae::Gamepad& gamepad);
         Gamepad(int a_iIndex);
         ~Gamepad();
         Gamepad(Gamepad&&);

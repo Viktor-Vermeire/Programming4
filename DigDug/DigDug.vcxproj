@@ -149,7 +149,9 @@
   <ItemGroup>
     <ClCompile Include="DiggingComponent.cpp" />
     <ClCompile Include="HallwaysComponent.cpp" />
+    <ClCompile Include="HasMovementInput.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
+    <ClCompile Include="IsDoneRunning.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Move.cpp" />
     <ClCompile Include="MovementComponent.cpp" />
@@ -159,12 +161,15 @@
     <ClCompile Include="PlaySound.cpp" />
     <ClCompile Include="RockComponent.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
+    <ClCompile Include="Running.cpp" />
     <ClCompile Include="Suicide.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DiggingComponent.h" />
     <ClInclude Include="HallwaysComponent.h" />
+    <ClInclude Include="HasMovementInput.h" />
     <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="IsDoneRunning.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="Pickup.h" />
@@ -173,6 +178,7 @@
     <ClInclude Include="PlaySound.h" />
     <ClInclude Include="RockComponent.h" />
     <ClInclude Include="RotatorComponent.h" />
+    <ClInclude Include="Running.h" />
     <ClInclude Include="Suicide.h" />
   </ItemGroup>
   <ItemGroup>

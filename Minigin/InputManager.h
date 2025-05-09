@@ -12,9 +12,12 @@ namespace dae
 	{
 	public:
 		bool ProcessInput();
+		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad);
 		void AddGamepad(std::unique_ptr<Gamepad> gamepad);
 		void AddGameActor(GameObject* gameActor);
 		int GetGameActorSize();
+
+		bool CheckExit();
 
 		template <typename CommandType, typename... Args>
 		void AddCommand(Args&&... args) {

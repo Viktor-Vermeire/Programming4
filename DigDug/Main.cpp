@@ -30,6 +30,11 @@
 #include "HallwaysComponent.h"
 #include "ServiceLocator.h"
 #include "AnimationComponent.h"
+#include "FiniteStateMachineComponent.h"
+#include "HasMovementInput.h"
+#include "HandleInput.h"
+#include "Running.h"
+#include "IsDoneRunning.h"
 namespace fs = std::filesystem;
 
 void InitializeCommands(dae::InputManager& input)
@@ -52,7 +57,7 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::PlaySound>(4096, true, 0);
 }
 
-void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::string name, bool usesGamePad,dae::InputManager& input, dae::Scene& scene, std::shared_ptr<dae::Font> font, std::shared_ptr<dae::GameObject> scoreBoardGo, dae::GameObject* hallways) {
+void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::string name, bool usesGamePad,int controllerIndex,dae::InputManager& input, dae::Scene& scene, std::shared_ptr<dae::Font> font, std::shared_ptr<dae::GameObject> scoreBoardGo, dae::GameObject* hallways) {
 	auto go = std::make_shared<dae::GameObject>();
 
 	auto PlayerLivesGo = std::make_shared<dae::GameObject>();
@@ -66,6 +71,26 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 
 	go = std::make_shared<dae::GameObject>();
 	go->AddComponent<dae::RenderComponent>(*go.get());
+	go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
+	auto t = std::make_unique<dae::Gamepad>(controllerIndex);
+	t->SetUsed(usesGamePad);
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::HandleInput>("HandleInput", *t);
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Running>("Running");
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::HasMovementInput>("HasMovementInput");
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
+
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("HandleInput"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("HasMovementInput"));
+
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("HandleInput"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsDoneRunning"));
+	go->GetComponent<dae::FiniteStateMachineComponent>()->SetCurrentState(
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("HandleInput")
+	);
 
 	//MovementComponent setup
 	go->AddComponent<dae::MovementComponent>(*go.get());
@@ -75,9 +100,13 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 
 	go->GetComponent<dae::RenderComponent>()->SetTexture(texturePath, textureSrcRect);
 	go->SetPosition(startPos[0], startPos[1]);
-	std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
+
+
+	/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
 	gamepad->SetUsed(usesGamePad);
-	input.AddGamepad(std::move(gamepad));
+	input.AddGamepad(std::move(gamepad));*/
+
+
 	go->AddComponent<dae::PlayerComponent>(*go.get(), name);
 	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8);
 	auto playerComp = go->GetComponent<dae::PlayerComponent>();
@@ -195,10 +224,10 @@ void load()
 	
 	auto hallways = SetupLevelAndReturnHallwaysObject(scene);
 	//Player setup
-	int pos[2]{ 81,81 };
-	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
+	//int pos[2]{ 81,81 };
+	//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
 	int pos2[2]{ 161,81 };
-	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, input, scene, smallFont, ScoreBoardParentGo, hallways);
+	SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), pos2,"Player 2", false, 0,input, scene, smallFont, ScoreBoardParentGo, hallways);
 
 	//Gameobject for the fps
 	auto go = std::make_shared<dae::GameObject>();

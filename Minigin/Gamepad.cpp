@@ -7,10 +7,14 @@ public:
 	GamePadImpl() {
 
 	}
-	GamePadImpl(int a_iIndex): m_ControllerIndex{ static_cast<DWORD>(a_iIndex) }
+	GamePadImpl(int a_iIndex) : m_ControllerIndex{static_cast<DWORD>(a_iIndex)}
 	{
 
 	}
+	GamePadImpl(const GamePadImpl& impl) { m_ControllerIndex = static_cast<DWORD>(impl.m_ControllerIndex ); m_Used = impl.m_Used;
+}
+	~GamePadImpl() {};
+	//dae::GamePadImpl& operator=(dae::GamePadImpl&&) = default;
 	int GetIndex()
 	{
 		return m_ControllerIndex;
@@ -47,6 +51,8 @@ public:
 		}
 		else
 		{
+			m_ButtonsPressedThisFrame = -1;
+			m_ButtonsReleasedThisFrame = -1;
 			// Controller is not connected
 		}
 	}
@@ -88,7 +94,7 @@ dae::Gamepad::Gamepad(): pimpl{std::make_unique<GamePadImpl>()}
 {
 }
 
-dae::Gamepad::Gamepad(int a_iIndex): pimpl(std::make_unique<GamePadImpl>(a_iIndex))
+dae::Gamepad::Gamepad(int a_iIndex) : pimpl(std::make_unique<GamePadImpl>(a_iIndex))
 {
 }
 
@@ -133,6 +139,6 @@ bool dae::Gamepad::IsPressed(unsigned int button) const
 }
 
 dae::Gamepad::~Gamepad() = default;
-
-dae::Gamepad::Gamepad(dae::Gamepad&&) = default;
+dae::Gamepad::Gamepad(const dae::Gamepad& gamepad) { pimpl = std::make_unique<GamePadImpl>(*gamepad.pimpl);};
+dae::Gamepad::Gamepad(dae::Gamepad&&) { pimpl = std::make_unique<GamePadImpl>(); };
 dae::Gamepad& dae::Gamepad::operator=(dae::Gamepad&&) = default;

@@ -107,7 +107,7 @@ void dae::Minigin::Run(const std::function<void()>& load)
 			Sleep(static_cast<DWORD>(1.f / m_RefreshRate - DELTATIME));
 			DELTATIME += 1.f / static_cast<float>(m_RefreshRate) - DELTATIME;
 		}
-		doContinue = input.ProcessInput();
+		doContinue = input.CheckExit();
 		sceneManager.Update();
 		ServiceLocator::get_SoundSystem().CleanupSoundThreads();
 		renderer.Render();
