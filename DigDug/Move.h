@@ -1,17 +1,17 @@
 #pragma once
 #include "Command.h"
 #include <utility>
-#include "AnimationComponent.h"
+#include "RenderComponent.h"
 #include "MovementComponent.h"
 namespace dae {
     class GameObject;
     class Move : public Command
     {
     public:
-        Move(int inputValue, bool usingGamepad, AnimationComponent::Direction direction);
+        Move(int inputValue, bool usingGamepad, RenderComponent::Direction direction);
         void execute(GameObject& gameObject);
     private:
-        AnimationComponent::Direction m_Direction;
+        RenderComponent::Direction m_Direction;
     };
 }
 

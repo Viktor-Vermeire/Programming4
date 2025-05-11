@@ -76,7 +76,7 @@ void dae::MovementComponent::ExecuteMove()
 	GetOwner()->SetPosition(localTransform.x + (m_CurrentMovement.x * Minigin::DELTATIME), localTransform.y + (m_CurrentMovement.y * Minigin::DELTATIME));
 }
 
-void dae::MovementComponent::Move(dae::AnimationComponent::Direction direction)
+void dae::MovementComponent::Move(dae::RenderComponent::Direction direction)
 {
 	/*if (m_IsMoving) //Should be deletable
 		return;*/
@@ -87,16 +87,16 @@ void dae::MovementComponent::Move(dae::AnimationComponent::Direction direction)
 		return;
 	//hallways->Dig(GetOwner()->GetWorldTransform().GetPosition(), GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{m_DistancePerMove / m_TimePerMove, 0, 0});
 	switch (direction) {
-	case AnimationComponent::RIGHT:
+	case RenderComponent::RIGHT:
 		m_CurrentMovement = { m_DistancePerMove / m_TimePerMove, 0 };
 		break;
-	case AnimationComponent::DOWN:
+	case RenderComponent::DOWN:
 		m_CurrentMovement = { 0 , m_DistancePerMove / m_TimePerMove };
 		break;
-	case AnimationComponent::UP:
+	case RenderComponent::UP:
 		m_CurrentMovement = { 0 , -m_DistancePerMove / m_TimePerMove };
 		break;
-	case AnimationComponent::LEFT:
+	case RenderComponent::LEFT:
 		m_CurrentMovement = { -m_DistancePerMove / m_TimePerMove, 0 };
 		break;
 	}

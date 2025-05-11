@@ -9,9 +9,8 @@ dae::HandleInput::HandleInput(const Gamepad& gamePad)
 	m_GamePad = std::make_unique<Gamepad>(gamePad);
 }
 
-void dae::HandleInput::Enter(GameObject* gameObject)
+void dae::HandleInput::Enter(GameObject*)
 {
-	gameObject->GetLocalTransform();
 }
 
 void dae::HandleInput::Execute(GameObject* gameObject)
@@ -19,7 +18,6 @@ void dae::HandleInput::Execute(GameObject* gameObject)
 	InputManager::GetInstance().ProcessPlayerInput(gameObject, m_GamePad.get());
 }
 
-void dae::HandleInput::Exit(GameObject* gameObject)
+void dae::HandleInput::Exit(GameObject*)
 {
-	gameObject->GetLocalTransform();
 }

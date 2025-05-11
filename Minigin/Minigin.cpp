@@ -18,6 +18,7 @@
 SDL_Window* g_window{};
 
 float dae::Minigin::DELTATIME = 0.f;
+std::mt19937 dae::Minigin::RANDOM(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
 
 void PrintSDLVersion()
 {

@@ -49,6 +49,12 @@
     <Filter Include="Header Files\States">
       <UniqueIdentifier>{eedbeeb4-5980-4b2a-afff-bad19ad44437}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Conditions">
+      <UniqueIdentifier>{171f87f6-e5b9-4046-a57c-477ffd284799}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\States">
+      <UniqueIdentifier>{87c92e91-bb48-417e-924b-a886ca97dedc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\3rdParty\imgui-1.91.8\imconfig.h">
@@ -156,14 +162,14 @@
     <ClInclude Include="HealthComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Condition.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="State.h">
       <Filter>Header Files\States</Filter>
     </ClInclude>
     <ClInclude Include="HandleInput.h">
       <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Condition.h">
+      <Filter>Header Files\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,10 +255,10 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="FiniteStateMachineComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="HandleInput.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\States</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

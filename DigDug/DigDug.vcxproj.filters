@@ -31,6 +31,12 @@
     <Filter Include="Header Files\Conditions">
       <UniqueIdentifier>{4bb2ffb1-3fc0-41ba-8f90-27a1edd673e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\States">
+      <UniqueIdentifier>{1d5b98d1-90ac-46b1-9124-9578cb12a9f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Conditions">
+      <UniqueIdentifier>{55ed1bcc-cb43-475e-afe2-71efa4f6cdb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -72,13 +78,34 @@
     <ClCompile Include="MovementComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Running.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Floating.cpp">
+      <Filter>Source Files\States</Filter>
     </ClCompile>
-    <ClCompile Include="HasMovementInput.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Running.cpp">
+      <Filter>Source Files\States</Filter>
     </ClCompile>
     <ClCompile Include="IsDoneRunning.cpp">
+      <Filter>Source Files\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="HasMovementInput.cpp">
+      <Filter>Source Files\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="FloatingComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="WantsToFloat.cpp">
+      <Filter>Source Files\Conditions</Filter>
+    </ClCompile>
+    <ClCompile Include="Attacking.cpp">
+      <Filter>Source Files\States</Filter>
+    </ClCompile>
+    <ClCompile Include="Idle.cpp">
+      <Filter>Source Files\States</Filter>
+    </ClCompile>
+    <ClCompile Include="HasValidDirection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,8 +152,29 @@
     <ClInclude Include="HasMovementInput.h">
       <Filter>Header Files\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="Floating.h">
+      <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="FloatingComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
     <ClInclude Include="IsDoneRunning.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="WantsToFloat.h">
+      <Filter>Header Files\Conditions</Filter>
+    </ClInclude>
+    <ClInclude Include="Idle.h">
+      <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Attacking.h">
+      <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="HasValidDirection.h">
+      <Filter>Header Files\Conditions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

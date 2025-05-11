@@ -3,6 +3,7 @@
 #include <functional>
 #include <chrono>
 #include "filesystem"
+#include <random>
 
 namespace dae
 {
@@ -18,6 +19,7 @@ namespace dae
 		Minigin& operator=(const Minigin& other) = delete;
 		Minigin& operator=(Minigin&& other) = delete;
 		static float DELTATIME;
+		static std::mt19937 RANDOM;
 		
 	private:
 		int m_RefreshRate;

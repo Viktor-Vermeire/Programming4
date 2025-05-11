@@ -86,6 +86,9 @@ void dae::InputManager::AddGameActor(GameObject* gameActor)
 int dae::InputManager::GetGameActorSize() {
 	return static_cast<int>(m_GameActors.size());
 }
+std::vector<dae::GameObject*> dae::InputManager::GetPlayers() {
+	return m_GameActors;
+}
 
 bool dae::InputManager::CheckExit()
 {

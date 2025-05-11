@@ -2,11 +2,11 @@
 #include "GameObject.h"
 #include "Transform.h"
 #include "Command.h"
-#include "AnimationComponent.h"
+#include "RenderComponent.h"
 #include "MovementComponent.h"
 
 namespace dae {
-	Move::Move(int inputValue,bool usingGamepad, AnimationComponent::Direction direction): Command(inputValue, usingGamepad), m_Direction{direction}
+	Move::Move(int inputValue,bool usingGamepad, RenderComponent::Direction direction): Command(inputValue, usingGamepad), m_Direction{direction}
 	{
 	}
 	void Move::execute(GameObject& gameObject)

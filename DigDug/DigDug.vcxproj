@@ -147,10 +147,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Attacking.cpp" />
     <ClCompile Include="DiggingComponent.cpp" />
+    <ClCompile Include="EnemyComponent.cpp" />
+    <ClCompile Include="Floating.cpp" />
+    <ClCompile Include="FloatingComponent.cpp" />
     <ClCompile Include="HallwaysComponent.cpp" />
     <ClCompile Include="HasMovementInput.cpp" />
+    <ClCompile Include="HasValidDirection.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
+    <ClCompile Include="Idle.cpp" />
     <ClCompile Include="IsDoneRunning.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Move.cpp" />
@@ -163,12 +169,19 @@
     <ClCompile Include="RotatorComponent.cpp" />
     <ClCompile Include="Running.cpp" />
     <ClCompile Include="Suicide.cpp" />
+    <ClCompile Include="WantsToFloat.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Attacking.h" />
     <ClInclude Include="DiggingComponent.h" />
+    <ClInclude Include="EnemyComponent.h" />
+    <ClInclude Include="Floating.h" />
+    <ClInclude Include="FloatingComponent.h" />
     <ClInclude Include="HallwaysComponent.h" />
     <ClInclude Include="HasMovementInput.h" />
+    <ClInclude Include="HasValidDirection.h" />
     <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="Idle.h" />
     <ClInclude Include="IsDoneRunning.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MovementComponent.h" />
@@ -180,6 +193,7 @@
     <ClInclude Include="RotatorComponent.h" />
     <ClInclude Include="Running.h" />
     <ClInclude Include="Suicide.h" />
+    <ClInclude Include="WantsToFloat.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Data\DigDug_SoundEffects\boss_fygar_firebreath.wav" />

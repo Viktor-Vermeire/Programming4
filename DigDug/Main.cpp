@@ -35,18 +35,20 @@
 #include "HandleInput.h"
 #include "Running.h"
 #include "IsDoneRunning.h"
+#include "Floating.h"
+#include "WantsToFloat.h"
 namespace fs = std::filesystem;
 
 void InitializeCommands(dae::InputManager& input)
 {
-	input.AddCommand<dae::Move>(1, true, dae::AnimationComponent::UP);
-	input.AddCommand<dae::Move>(2, true, dae::AnimationComponent::DOWN);
-	input.AddCommand<dae::Move>(4, true, dae::AnimationComponent::LEFT);
-	input.AddCommand<dae::Move>(8, true, dae::AnimationComponent::RIGHT);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_W, false, dae::AnimationComponent::UP);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_S, false, dae::AnimationComponent::DOWN);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_A, false, dae::AnimationComponent::LEFT);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_D, false, dae::AnimationComponent::RIGHT);
+	input.AddCommand<dae::Move>(1, true, dae::RenderComponent::UP);
+	input.AddCommand<dae::Move>(2, true, dae::RenderComponent::DOWN);
+	input.AddCommand<dae::Move>(4, true, dae::RenderComponent::LEFT);
+	input.AddCommand<dae::Move>(8, true, dae::RenderComponent::RIGHT);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_W, false, dae::RenderComponent::UP);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_S, false, dae::RenderComponent::DOWN);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_A, false, dae::RenderComponent::LEFT);
+	input.AddCommand<dae::Move>(SDL_SCANCODE_D, false, dae::RenderComponent::RIGHT);
 	input.AddCommand<dae::Suicide>(32768, true);
 	input.AddCommand<dae::Suicide>(SDL_SCANCODE_C, false);
 	input.AddCommand<dae::Pickup>(16384, true, 10);
@@ -125,6 +127,55 @@ void SetupPlayer(std::string texturePath, SDL_Rect textureSrcRect, int startPos[
 	input.AddGameActor(go.get());
 	scene.Add(PlayerLivesGo);
 	scene.Add(PlayerScoreGo);
+
+}
+
+void SetupEnemy(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::vector<SDL_Rect> animLocations, dae::Scene& scene, dae::GameObject* hallways) {
+	auto go = std::make_shared<dae::GameObject>();
+
+	go = std::make_shared<dae::GameObject>();
+	go->AddComponent<dae::RenderComponent>(*go.get());
+	go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToPlayer>("FloatingToPlayer", animLocations, 0.3f);
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToPlayer>("FloatingToGrid", animLocations, 0.3f);
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Running>("Running");
+	//go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::HasMovementInput>("HasMovementInput");
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::WantsToFloat>("WantsToFloat", 5.0f);
+
+	/*go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("HandleInput"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("HasMovementInput"));
+
+	go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("HandleInput"),
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsDoneRunning"));
+	go->GetComponent<dae::FiniteStateMachineComponent>()->SetCurrentState(
+		go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("HandleInput")
+	);*/
+
+	//MovementComponent setup
+	go->AddComponent<dae::MovementComponent>(*go.get());
+	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
+	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
+	go->GetComponent<dae::MovementComponent>()->SetHallways(hallways);
+
+	go->GetComponent<dae::RenderComponent>()->SetTexture(texturePath, textureSrcRect);
+	go->SetPosition(startPos[0], startPos[1]);
+
+
+	/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
+	gamepad->SetUsed(usesGamePad);
+	input.AddGamepad(std::move(gamepad));*/
+
+
+	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8);
+	auto healthComp = go->GetComponent<dae::HealthComponent>();
+	//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
+	//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
+	scene.Add(go);
 }
 
 void SetupHallwaySources(dae::GameObject* go) {

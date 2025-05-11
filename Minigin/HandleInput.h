@@ -9,9 +9,9 @@ namespace dae {
     {
     public:
         HandleInput(const Gamepad& gamePad);
-        void Enter(GameObject* gameObject) override;
+        void Enter(GameObject* ) override;
         void Execute(GameObject* gameObject) override;
-        void Exit(GameObject* gameObject) override;
+        void Exit(GameObject* ) override;
     private :
         std::unique_ptr<Gamepad> m_GamePad;
     };

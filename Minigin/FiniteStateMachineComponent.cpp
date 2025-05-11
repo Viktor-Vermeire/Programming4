@@ -2,6 +2,7 @@
 #include "State.h"
 #include "Condition.h"
 #include "map"
+#include "Minigin.h"
 using namespace dae;
 dae::FiniteStateMachineComponent::FiniteStateMachineComponent(GameObject& gameObject): BaseComponent(gameObject)
 {
@@ -74,15 +75,21 @@ void dae::FiniteStateMachineComponent::RemoveCondition(std::string name)
 
 void dae::FiniteStateMachineComponent::Update()
 {
+	m_TimeInCurrentState += Minigin::DELTATIME;
 	m_CurrentState->Execute(GetOwner());
 	std::vector<std::pair<dae::Condition*, dae::State*>> options = GetToStates(m_CurrentState);
 	for (auto option : options) {
 		
 		if (option.first->IsMet(GetOwner())) {
+			m_TimeInCurrentState = 0;
 			m_CurrentState->Exit(GetOwner());
 			option.second->Enter(GetOwner());
 			m_CurrentState = option.second;
 			break;
 		}
 	}
+}
+
+float dae::FiniteStateMachineComponent::GetTimeInCurrentState() {
+	return m_TimeInCurrentState;
 }

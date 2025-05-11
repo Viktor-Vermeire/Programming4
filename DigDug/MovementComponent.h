@@ -18,7 +18,7 @@ namespace dae {
 		bool IsRunning();
 		void Update() override;
 		void ExecuteMove();
-		void Move(dae::AnimationComponent::Direction direction);
+		void Move(dae::RenderComponent::Direction direction);
 	private:
 		GameObject* m_Hallways;
 		bool m_IsMoving;

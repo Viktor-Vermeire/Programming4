@@ -7,7 +7,7 @@
 
 namespace dae
 {
-	
+	class GameObject;
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
@@ -16,6 +16,7 @@ namespace dae
 		void AddGamepad(std::unique_ptr<Gamepad> gamepad);
 		void AddGameActor(GameObject* gameActor);
 		int GetGameActorSize();
+		std::vector<GameObject*> GetPlayers();
 
 		bool CheckExit();
 

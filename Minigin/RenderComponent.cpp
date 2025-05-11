@@ -5,7 +5,7 @@
 #include "Texture2D.h"
 
 dae::RenderComponent::RenderComponent(GameObject& gameObject):
-	BaseComponent(gameObject)
+	BaseComponent(gameObject), m_Direction{RIGHT}
 {
 }
 
@@ -26,6 +26,11 @@ SDL_Rect dae::RenderComponent::GetBox()
 	return m_Box;
 }
 
+void dae::RenderComponent::SetBox(SDL_Rect box)
+{
+	m_Box = box;
+}
+
 void dae::RenderComponent::Render()
 {
 	const auto& pos = BaseComponent::GetOwner()->GetWorldTransform().GetPosition();
@@ -34,4 +39,9 @@ void dae::RenderComponent::Render()
 	else {
 		Renderer::GetInstance().RenderTexture(*m_Texture, m_Box, SDL_Rect(static_cast<int>(pos.x), static_cast<int>(pos.y), m_Box.w, m_Box.h));
 	}
+}
+
+void dae::RenderComponent::SetDirection(Direction direction)
+{
+	m_Direction = direction;
 }

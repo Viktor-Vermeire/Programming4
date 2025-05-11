@@ -7,7 +7,7 @@
 dae::AnimationComponent::AnimationComponent(GameObject& gameObject) : BaseComponent(gameObject)
 {
 	m_CurrentState = IDLE;
-	m_Direction = RIGHT;
+	m_Direction = RenderComponent::RIGHT;
 	m_TimeInAnimation = 0;
 }
 
@@ -22,7 +22,7 @@ void dae::AnimationComponent::SetCurrentAnimationState(AnimationState state)
 	m_TimeInAnimation = 0;
 }
 
-void dae::AnimationComponent::SetDirection(Direction direction)
+void dae::AnimationComponent::SetDirection(RenderComponent::Direction direction)
 {
 	m_Direction = direction;
 }
