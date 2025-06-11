@@ -90,6 +90,14 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect src, 
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
 }
 
+void dae::Renderer::RenderTextureOriented(const Texture2D& texture, const SDL_Rect src, const SDL_Rect dst, double angle, SDL_RendererFlip flip, bool centered) const
+{
+	auto center = SDL_Point{ 0,0 };
+	if (centered) 
+		center = SDL_Point{ dst.w / 2,dst.h / 2 }; 
+	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst, angle, &center, flip);
+}
+
 SDL_Window* dae::Renderer::GetSDLWindow()
 {
 	return m_window;

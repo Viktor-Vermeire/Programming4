@@ -12,7 +12,9 @@ namespace dae {
 	void Move::execute(GameObject& gameObject)
 	{
 		MovementComponent* component = gameObject.GetComponent<MovementComponent>();
+		RenderComponent* render = gameObject.GetComponent<RenderComponent>();
 		if (component != nullptr) {
+			render->SetDirection(m_Direction);
 			component->Move(m_Direction);
 		}
 	}

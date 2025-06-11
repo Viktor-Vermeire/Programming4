@@ -76,12 +76,13 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Minigin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -92,7 +93,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -100,6 +101,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Minigin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,12 +114,13 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Minigin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -128,7 +131,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -136,6 +139,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)Minigin;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,17 +151,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Attacking.cpp" />
+    <ClCompile Include="DigDugAttackCommand.cpp" />
+    <ClCompile Include="DigDugAttackComponent.cpp" />
+    <ClCompile Include="Conditions.cpp" />
     <ClCompile Include="DiggingComponent.cpp" />
     <ClCompile Include="EnemyComponent.cpp" />
-    <ClCompile Include="Floating.cpp" />
     <ClCompile Include="FloatingComponent.cpp" />
     <ClCompile Include="HallwaysComponent.cpp" />
-    <ClCompile Include="HasMovementInput.cpp" />
-    <ClCompile Include="HasValidDirection.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
-    <ClCompile Include="Idle.cpp" />
-    <ClCompile Include="IsDoneRunning.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Move.cpp" />
     <ClCompile Include="MovementComponent.cpp" />
@@ -167,33 +168,29 @@
     <ClCompile Include="PlaySound.cpp" />
     <ClCompile Include="RockComponent.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
-    <ClCompile Include="Running.cpp" />
+    <ClCompile Include="States.cpp" />
     <ClCompile Include="Suicide.cpp" />
-    <ClCompile Include="WantsToFloat.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Attacking.h" />
+    <ClInclude Include="DigDugAttackCommand.h" />
+    <ClInclude Include="DigDugAttackComponent.h" />
+    <ClInclude Include="Conditions.h" />
     <ClInclude Include="DiggingComponent.h" />
     <ClInclude Include="EnemyComponent.h" />
-    <ClInclude Include="Floating.h" />
     <ClInclude Include="FloatingComponent.h" />
     <ClInclude Include="HallwaysComponent.h" />
-    <ClInclude Include="HasMovementInput.h" />
-    <ClInclude Include="HasValidDirection.h" />
     <ClInclude Include="HealthComponent.h" />
-    <ClInclude Include="Idle.h" />
-    <ClInclude Include="IsDoneRunning.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="PlayerInfoComponent.h" />
+    <ClInclude Include="PlayerState.h" />
     <ClInclude Include="PlaySound.h" />
     <ClInclude Include="RockComponent.h" />
     <ClInclude Include="RotatorComponent.h" />
-    <ClInclude Include="Running.h" />
+    <ClInclude Include="States.h" />
     <ClInclude Include="Suicide.h" />
-    <ClInclude Include="WantsToFloat.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Data\DigDug_SoundEffects\boss_fygar_firebreath.wav" />

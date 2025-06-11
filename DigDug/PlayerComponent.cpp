@@ -1,7 +1,6 @@
 #include "PlayerComponent.h"
 #include "BaseComponent.h"
 #include "GameObject.h"
-using namespace dae;
 
 
 dae::PlayerComponent::PlayerComponent(GameObject& gameObject,std::string name) :

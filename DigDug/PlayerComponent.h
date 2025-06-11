@@ -14,6 +14,7 @@ namespace dae {
         void AddObserver(IObserver* observer) override;
         void RemoveObserver(IObserver* observer) override;
         void Notify(Event event) override;
+
     private:
         std::string m_Name;
         int m_Score = 0;

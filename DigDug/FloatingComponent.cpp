@@ -16,12 +16,13 @@ void dae::FloatingComponent::MoveTarget()
 
 void dae::FloatingComponent::MoveToGrid()
 {
-	auto direction = glm::normalize(m_GridTarget.GetPosition() - GetOwner()->GetWorldTransform().GetPosition());
-	auto distance = m_GridTarget.GetPosition() - GetOwner()->GetWorldTransform().GetPosition();
-	auto res = glm::length(distance);
+	auto direction = glm::normalize(m_GridTarget - GetOwner()->GetWorldTransform().GetPosition());
+	auto distance = m_GridTarget - GetOwner()->GetWorldTransform().GetPosition();
+	//auto res = glm::length(distance);
 	glm::vec3 localPos;
 	if (glm::length(distance) < glm::length(direction * m_MovementSpeed)) {
 		localPos = GetOwner()->GetLocalTransform().GetPosition() + distance;
+		m_InGrid = true;
 	}
 	else {
 		localPos = GetOwner()->GetLocalTransform().GetPosition() + (direction * m_MovementSpeed);
@@ -30,7 +31,7 @@ void dae::FloatingComponent::MoveToGrid()
 	GetOwner()->SetPosition(localPos.x, localPos.y);
 }
 
-void dae::FloatingComponent::SetGridTarget(Transform gridTarget)
+void dae::FloatingComponent::SetGridTarget(glm::vec3 gridTarget)
 {
 	m_GridTarget = gridTarget;
 }
@@ -38,4 +39,14 @@ void dae::FloatingComponent::SetGridTarget(Transform gridTarget)
 void dae::FloatingComponent::SetPlayerTarget(GameObject* target)
 {
 	m_Target = target;
+}
+
+void dae::FloatingComponent::SetInGrid(bool value)
+{
+	m_InGrid = value;
+}
+
+bool dae::FloatingComponent::InGrid()
+{
+	return m_InGrid;
 }

@@ -7,8 +7,10 @@
 #include "GameObject.h"
 #include "iostream"
 #include "memory"
+#include "map"
+#include "Command.h"
 
-bool dae::InputManager::ProcessInput()
+/*bool dae::InputManager::ProcessInput()
 {
 	const Uint8* pStates = SDL_GetKeyboardState(nullptr);
 	SDL_Event e;
@@ -38,11 +40,10 @@ bool dae::InputManager::ProcessInput()
 		}
 	}
 		return true;
-}
+}*/
 
 bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad)
 {
-
 	const Uint8* pStates = SDL_GetKeyboardState(nullptr);
 	SDL_Event e;
 

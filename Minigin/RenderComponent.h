@@ -17,6 +17,7 @@ namespace dae {
         void SetTexture(const std::string& filename, SDL_Rect box);
         SDL_Rect GetBox();
         void SetBox(SDL_Rect box);
+        Direction GetDirection();
         void Render() override;
         void SetDirection(Direction direction);
     private:

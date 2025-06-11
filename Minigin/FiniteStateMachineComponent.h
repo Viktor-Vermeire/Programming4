@@ -32,9 +32,10 @@ namespace dae {
 		void RemoveState(std::string name);
 		void RemoveCondition(std::string name);
 		void Update() override;
-		float GetTimeInCurrentState();
+		float GetTimeInCurrentSituation();
+		void SetTimeInCurrentSituation(float time);
 	private:
-		float m_TimeInCurrentState;
+		float m_TimeInCurrentSituation;
 		State* m_CurrentState;
 		std::map<std::string,std::unique_ptr<State>> m_States;
 		std::map<std::string, std::unique_ptr<Condition>> m_Conditions;

@@ -3,7 +3,7 @@
 #include "Condition.h"
 #include "map"
 #include "Minigin.h"
-using namespace dae;
+#include "iostream"
 dae::FiniteStateMachineComponent::FiniteStateMachineComponent(GameObject& gameObject): BaseComponent(gameObject)
 {
 }
@@ -53,12 +53,12 @@ void dae::FiniteStateMachineComponent::SetCurrentState(State* state)
 	m_CurrentState = state;
 }
 
-State* dae::FiniteStateMachineComponent::GetState(std::string name)
+dae::State* dae::FiniteStateMachineComponent::GetState(std::string name)
 {
 	return m_States[name].get();
 }
 
-Condition* dae::FiniteStateMachineComponent::GetCondition(std::string name)
+dae::Condition* dae::FiniteStateMachineComponent::GetCondition(std::string name)
 {
 	return m_Conditions[name].get();
 }
@@ -75,21 +75,25 @@ void dae::FiniteStateMachineComponent::RemoveCondition(std::string name)
 
 void dae::FiniteStateMachineComponent::Update()
 {
-	m_TimeInCurrentState += Minigin::DELTATIME;
+	m_TimeInCurrentSituation += Minigin::DELTATIME;
 	m_CurrentState->Execute(GetOwner());
 	std::vector<std::pair<dae::Condition*, dae::State*>> options = GetToStates(m_CurrentState);
 	for (auto option : options) {
-		
 		if (option.first->IsMet(GetOwner())) {
-			m_TimeInCurrentState = 0;
 			m_CurrentState->Exit(GetOwner());
 			option.second->Enter(GetOwner());
 			m_CurrentState = option.second;
+			std::cout << typeid(*option.second).name() << "\n";
 			break;
 		}
 	}
 }
 
-float dae::FiniteStateMachineComponent::GetTimeInCurrentState() {
-	return m_TimeInCurrentState;
+float dae::FiniteStateMachineComponent::GetTimeInCurrentSituation() {
+	return m_TimeInCurrentSituation;
+}
+
+void dae::FiniteStateMachineComponent::SetTimeInCurrentSituation(float time)
+{
+	m_TimeInCurrentSituation = time;
 }

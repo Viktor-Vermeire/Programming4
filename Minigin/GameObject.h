@@ -62,6 +62,7 @@ namespace dae
 
 		void SetPosition(float x, float y);
 		void SetParent(GameObject* gameObject);
+		GameObject* GetParent();
 		Transform GetWorldTransform();
 		Transform GetLocalTransform();
 		//void CleanupChildren();

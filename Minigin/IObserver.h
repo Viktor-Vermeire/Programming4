@@ -1,7 +1,7 @@
 #pragma once
 namespace dae {
 	class GameObject;
-	enum Event {DEATH, SCORE};
+	enum Event {DEATH, SCORE, POSITION};
 	class IObserver
 	{
 	public:

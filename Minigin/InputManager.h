@@ -4,6 +4,7 @@
 #include "vector"
 #include "memory"
 #include "Gamepad.h"
+#include "map"
 
 namespace dae
 {
@@ -11,10 +12,11 @@ namespace dae
 	class InputManager final : public Singleton<InputManager>
 	{
 	public:
-		bool ProcessInput();
+		//bool ProcessInput();
 		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad);
 		void AddGamepad(std::unique_ptr<Gamepad> gamepad);
 		void AddGameActor(GameObject* gameActor);
+		//Command* GetCommand(std::string key);
 		int GetGameActorSize();
 		std::vector<GameObject*> GetPlayers();
 
@@ -26,8 +28,9 @@ namespace dae
 			m_Commands.push_back(std::make_unique<CommandType>(std::forward<Args>(args)...));
 		}
 	private:
-		std::vector<std::unique_ptr<Command>> m_Commands;
+		//std::vector<std::unique_ptr<Command>> m_Commands;
 		std::vector<std::unique_ptr<Gamepad>> m_GamePads;
+		std::vector<std::unique_ptr<Command>> m_Commands;
 		std::vector<GameObject*> m_GameActors;
 	};
 

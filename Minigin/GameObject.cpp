@@ -7,6 +7,7 @@
 #include "memory"
 #include "BaseComponent.h"
 #include "Transform.h"
+#include "ISubject.h"
 
 dae::GameObject::GameObject()
 {
@@ -55,6 +56,11 @@ void dae::GameObject::SetParent(GameObject* gameObject)
 		m_Parent = gameObject;
 		m_LocalTransform.SetPosition(temp.x, temp.y, temp.z);
 	}
+}
+
+dae::GameObject* dae::GameObject::GetParent()
+{
+	return m_Parent;
 }
 
 void dae::GameObject::AddChild(GameObject* gameObject)

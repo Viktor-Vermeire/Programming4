@@ -5,8 +5,8 @@ namespace dae {
 		m_SoundId {soundId}
 	{
 	}
-	void PlaySound::execute(GameObject& gameObject)
+	void PlaySound::execute(GameObject&)
 	{
-		ServiceLocator::get_SoundSystem().play(m_SoundId, 100);
+		ServiceLocator::get_SoundSystem().play(static_cast<const unsigned short>(m_SoundId), 100);
 	}
 }

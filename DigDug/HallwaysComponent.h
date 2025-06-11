@@ -21,6 +21,9 @@ namespace dae {
         void SetTexture(const std::string& filename);
         void Dig(const glm::vec3 fromlocation, const glm::vec3 tolocation);
         void AddSource(HallwayType type, SDL_Rect source);
+        const HallwayType& GetHallwayType(const glm::vec3 location);
+        glm::vec3 GetFreeHallwayLocation(const glm::vec3 location);
+        void SetHallwayType(std::pair<int, int> index, HallwayType desiredType);
         void Update() override;
         void Render() override;
     private:

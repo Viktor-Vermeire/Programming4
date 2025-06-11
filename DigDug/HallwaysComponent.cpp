@@ -61,6 +61,34 @@ void dae::HallwaysComponent::AddSource(HallwayType type, SDL_Rect source)
 	m_Sources.insert(std::pair<HallwayType, SDL_Rect>(type, source));
 }
 
+const dae::HallwaysComponent::HallwayType& dae::HallwaysComponent::GetHallwayType(const glm::vec3 location)
+{
+	return m_Hallways.at(static_cast<int>(std::round(location.y / 16))).at(static_cast<int>(std::round(location.x / 16)));
+}
+
+glm::vec3 dae::HallwaysComponent::GetFreeHallwayLocation(const glm::vec3 location)
+{
+	_int64 yindex = static_cast<_int64>(std::round(location.y / 16));
+	_int64 xindex = static_cast<_int64>(std::round(location.x / 16));
+	yindex--;
+	xindex++;
+	for (int looper{ 0 }; looper < 3; ++looper) {
+		xindex -= 2;
+		for (int innerlooper{ 0 }; innerlooper < 3; ++innerlooper) {
+			if (m_Hallways[yindex][xindex] != FILLED) {
+				return glm::vec3{ xindex * 16,yindex * 16, 0 };
+			}
+		}
+	}
+	//Als Ik ooit hier kom, big problem
+	return glm::vec3();
+}
+
+void dae::HallwaysComponent::SetHallwayType(std::pair<int, int> index, HallwayType desiredType)
+{
+	m_Hallways.at(index.first).at(index.second) = desiredType;
+}
+
 void dae::HallwaysComponent::Update()
 {
 	
@@ -82,134 +110,150 @@ void dae::HallwaysComponent::Render()
 
 void dae::HallwaysComponent::DigRight(const glm::vec3 fromLocation, const glm::vec3 toLocation)
 {
-	switch (m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16)) {
-	case FILLED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = RIGHTCLOSED;
+	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
+	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
+	auto fromYIndex = static_cast<_int64>(std::round(fromLocation.y / 16));
+	auto fromXIndex = static_cast<_int64>(std::round(fromLocation.x / 16));
+	switch (m_Hallways.at(toYIndex).at(toXIndex)) {
+	case FILLED: m_Hallways.at(toYIndex).at(toXIndex) = RIGHTCLOSED;
 		break;
-	case TOPCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = RIGHTTOPCORNER;
+	case TOPCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = RIGHTTOPCORNER;
 		break;
-	case VERTICALTHROUGH: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case VERTICALTHROUGH: m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case LEFTCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = HORIZONTALTHROUGH;
+	case LEFTCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = HORIZONTALTHROUGH;
 		break;
-	case BOTTOMCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = RIGHTBOTTOMCORNER;
+	case BOTTOMCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = RIGHTBOTTOMCORNER;
 		break;
-	case LEFTTOPCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case LEFTTOPCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case LEFTBOTTOMCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case LEFTBOTTOMCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
 	}
-	switch (m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16)) {
-	case TOPCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = LEFTTOPCORNER;
+	switch (m_Hallways.at(fromYIndex).at(fromXIndex)) {
+	case TOPCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = LEFTTOPCORNER;
 		break;
-	case VERTICALTHROUGH: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case VERTICALTHROUGH: m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case RIGHTCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = HORIZONTALTHROUGH;
+	case RIGHTCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = HORIZONTALTHROUGH;
 		break;
-	case BOTTOMCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = LEFTBOTTOMCORNER;
+	case BOTTOMCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = LEFTBOTTOMCORNER;
 		break;
-	case RIGHTTOPCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case RIGHTTOPCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case RIGHTBOTTOMCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case RIGHTBOTTOMCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
 	}
 }
 
 void dae::HallwaysComponent::DigLeft(const glm::vec3 fromLocation, const glm::vec3 toLocation)
 {
-	switch (m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16)) {
-	case FILLED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = LEFTCLOSED;
+	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
+	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
+	auto fromYIndex = static_cast<_int64>(std::round(fromLocation.y / 16));
+	auto fromXIndex = static_cast<_int64>(std::round(fromLocation.x / 16));
+	switch (m_Hallways.at(toYIndex).at(toXIndex)) {
+	case FILLED: m_Hallways.at(toYIndex).at(toXIndex) = LEFTCLOSED;
 		break;
-	case TOPCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = LEFTTOPCORNER;
+	case TOPCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = LEFTTOPCORNER;
 		break;
-	case VERTICALTHROUGH: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case VERTICALTHROUGH: m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case RIGHTCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = HORIZONTALTHROUGH;
+	case RIGHTCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = HORIZONTALTHROUGH;
 		break;
-	case BOTTOMCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = LEFTBOTTOMCORNER;
+	case BOTTOMCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = LEFTBOTTOMCORNER;
 		break;
-	case RIGHTTOPCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case RIGHTTOPCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
 	}
-	switch (m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16)) {
-	case TOPCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = RIGHTTOPCORNER;
+	switch (m_Hallways.at(fromYIndex).at(fromXIndex)) {
+	case TOPCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = RIGHTTOPCORNER;
 		break;
-	case VERTICALTHROUGH: m_Hallways.at(toLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case VERTICALTHROUGH: m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
+		break; //Check if this works
+	case LEFTCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = HORIZONTALTHROUGH;
 		break;
-	case LEFTCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = HORIZONTALTHROUGH;
+	case BOTTOMCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = RIGHTBOTTOMCORNER;
 		break;
-	case BOTTOMCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = RIGHTBOTTOMCORNER;
+	case LEFTTOPCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case LEFTTOPCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
-		break;
-	case LEFTBOTTOMCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case LEFTBOTTOMCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
 	}
 }
 
 void dae::HallwaysComponent::DigUp(const glm::vec3 fromLocation, const glm::vec3 toLocation)
 {
-	switch (m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16)) {
-	case FILLED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = TOPCLOSED;
+	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
+	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
+	auto fromYIndex = static_cast<_int64>(std::round(fromLocation.y / 16));
+	auto fromXIndex = static_cast<_int64>(std::round(fromLocation.x / 16));
+	switch (m_Hallways.at(toYIndex).at(toXIndex)) {
+	case FILLED: m_Hallways.at(toYIndex).at(toXIndex) = TOPCLOSED;
 		break;
-	case BOTTOMCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = VERTICALTHROUGH;
+	case BOTTOMCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = VERTICALTHROUGH;
 		break;
-	case HORIZONTALTHROUGH: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case HORIZONTALTHROUGH: m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case LEFTCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = LEFTTOPCORNER;
+	case LEFTCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = LEFTTOPCORNER;
 		break;
-	case RIGHTCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = RIGHTTOPCORNER;
+	case RIGHTCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = RIGHTTOPCORNER;
 		break;
-	case LEFTBOTTOMCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case LEFTBOTTOMCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case RIGHTBOTTOMCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case RIGHTBOTTOMCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
 	}
-	switch (m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16)) {
-	case TOPCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = VERTICALTHROUGH;
+	switch (m_Hallways.at(fromYIndex).at(fromXIndex)) {
+	case TOPCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = VERTICALTHROUGH;
 		break;
-	case HORIZONTALTHROUGH: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case HORIZONTALTHROUGH: m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case LEFTCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = LEFTBOTTOMCORNER;
+	case LEFTCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = LEFTBOTTOMCORNER;
 		break;
-	case RIGHTCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = RIGHTBOTTOMCORNER;
+	case RIGHTCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = RIGHTBOTTOMCORNER;
 		break;
-	case LEFTTOPCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case LEFTTOPCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case RIGHTTOPCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case RIGHTTOPCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
 	}
 }
 
 void dae::HallwaysComponent::DigDown(const glm::vec3 fromLocation, const glm::vec3 toLocation)
 {
-	switch (m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16)) {
-	case FILLED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = BOTTOMCLOSED;
+	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
+	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
+	auto fromYIndex = static_cast<_int64>(std::round(fromLocation.y / 16));
+	auto fromXIndex = static_cast<_int64>(std::round(fromLocation.x / 16));
+	switch (m_Hallways.at(toYIndex).at(toXIndex)) {
+	case FILLED: m_Hallways.at(toYIndex).at(toXIndex) = BOTTOMCLOSED;
 		break;
-	case TOPCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = VERTICALTHROUGH;
+	case TOPCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = VERTICALTHROUGH;
 		break;
-	case HORIZONTALTHROUGH: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case HORIZONTALTHROUGH: m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case LEFTCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = LEFTBOTTOMCORNER;
+	case LEFTCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = LEFTBOTTOMCORNER;
 		break;
-	case RIGHTCLOSED: m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = RIGHTBOTTOMCORNER;
+	case RIGHTCLOSED: m_Hallways.at(toYIndex).at(toXIndex) = RIGHTBOTTOMCORNER;
 		break;
-	case LEFTTOPCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case LEFTTOPCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
-	case RIGHTTOPCORNER:m_Hallways.at(toLocation.y / 16).at(toLocation.x / 16) = CLEARED;
+	case RIGHTTOPCORNER:m_Hallways.at(toYIndex).at(toXIndex) = CLEARED;
 		break;
 	}
-	switch (m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16)) {
-	case BOTTOMCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = VERTICALTHROUGH;
+	switch (m_Hallways.at(fromYIndex).at(fromXIndex)) {
+	case BOTTOMCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = VERTICALTHROUGH;
 		break;
-	case HORIZONTALTHROUGH: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case HORIZONTALTHROUGH: m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case LEFTCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = LEFTTOPCORNER;
+	case LEFTCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = LEFTTOPCORNER;
 		break;
-	case RIGHTCLOSED: m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = RIGHTTOPCORNER;
+	case RIGHTCLOSED: m_Hallways.at(fromYIndex).at(fromXIndex) = RIGHTTOPCORNER;
 		break;
-	case LEFTBOTTOMCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case LEFTBOTTOMCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
-	case RIGHTBOTTOMCORNER:m_Hallways.at(fromLocation.y / 16).at(fromLocation.x / 16) = CLEARED;
+	case RIGHTBOTTOMCORNER:m_Hallways.at(fromYIndex).at(fromXIndex) = CLEARED;
 		break;
 	}
 }

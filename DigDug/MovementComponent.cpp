@@ -19,11 +19,6 @@ void dae::MovementComponent::SetTimePerMove(float time) {
 	m_TimePerMove = time;
 }
 
-void dae::MovementComponent::SetHallways(GameObject* hallways)
-{
-	m_Hallways = hallways;
-}
-
 void dae::MovementComponent::ResetMovement()
 {
 	m_TimeInMovement = 0;
@@ -46,6 +41,11 @@ bool dae::MovementComponent::IsRunning()
 	return m_IsMoving;
 }
 
+void dae::MovementComponent::SetIsDigger(bool digger)
+{
+	m_IsDigger = digger;
+}
+
 void dae::MovementComponent::Update()
 {
 	/*if (!m_IsMoving)
@@ -65,7 +65,7 @@ void dae::MovementComponent::ExecuteMove()
 {
 	m_IsMoving = true;
 	auto& localTransform = GetOwner()->GetLocalTransform().GetPosition();
-	std::cout << "Time: " << Minigin::DELTATIME << "\n";
+	//std::cout << "Time: " << Minigin::DELTATIME << "\n";
 	if (m_TimeInMovement + Minigin::DELTATIME > m_TimePerMove) {
 		m_IsMoving = false;
 		GetOwner()->SetPosition(localTransform.x + (m_CurrentMovement.x * (m_TimePerMove - m_TimeInMovement)), localTransform.y + m_CurrentMovement.y * (m_TimePerMove - m_TimeInMovement));
@@ -80,9 +80,11 @@ void dae::MovementComponent::Move(dae::RenderComponent::Direction direction)
 {
 	/*if (m_IsMoving) //Should be deletable
 		return;*/
-	std::cout << "Being hit \n";
+	if (!GetOwner()->GetParent()) return;
+	//std::cout << "Being hit \n";
 	m_WantsToMove = true;
-	HallwaysComponent* hallways = ((m_Hallways != nullptr) ? m_Hallways->GetComponent<HallwaysComponent>() : nullptr);
+	
+	HallwaysComponent* hallways = ((GetOwner()->GetParent() != nullptr) ? GetOwner()->GetParent()->GetComponent<HallwaysComponent>() : nullptr);
 	if (hallways == nullptr)
 		return;
 	//hallways->Dig(GetOwner()->GetWorldTransform().GetPosition(), GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{m_DistancePerMove / m_TimePerMove, 0, 0});
@@ -100,6 +102,6 @@ void dae::MovementComponent::Move(dae::RenderComponent::Direction direction)
 		m_CurrentMovement = { -m_DistancePerMove / m_TimePerMove, 0 };
 		break;
 	}
-	//auto loc = GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{ -1, 1, 0};
-	hallways->Dig(GetOwner()->GetWorldTransform().GetPosition(), GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{ m_CurrentMovement * m_TimePerMove, 0 });
+	if (m_IsDigger) 
+		hallways->Dig(GetOwner()->GetWorldTransform().GetPosition(), GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{ m_CurrentMovement * m_TimePerMove, 0 });
 }
