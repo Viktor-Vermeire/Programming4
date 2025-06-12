@@ -7,6 +7,6 @@ namespace dae {
 	}
 	void PlaySound::execute(GameObject&)
 	{
-		ServiceLocator::get_SoundSystem().play(static_cast<const unsigned short>(m_SoundId), 100);
+		ServiceLocator::get_SoundSystem().PlayEffect(static_cast<const unsigned short>(m_SoundId), 100);
 	}
 }

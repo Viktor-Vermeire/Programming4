@@ -6,7 +6,8 @@
 
 namespace dae{
 	class GameObject;
-
+    class Command;
+    class Gamepad;
     class Attacking :
         public State
     {
@@ -30,6 +31,7 @@ namespace dae{
         void Enter(GameObject*) override;
         void Execute(GameObject* gameObject) override;
         void Exit(GameObject*) override;
+        float GetTimeInState();
     private:
         float m_TimePerFrame = 0;
         float m_TimeInState = 0;
@@ -48,15 +50,17 @@ namespace dae{
         std::vector<SDL_Rect> m_AnimationLocations;
         glm::vec3 m_Target;
     };
-
+    
     class DigDugAttack : public State {
     public:
-        DigDugAttack();
+        DigDugAttack(Gamepad* gamePad);
         void Enter(GameObject* GameObject) override;
         void Execute(GameObject*) override;
         void Exit(GameObject*) override;
+        void AddCommand(Command* command);
     private:
-        
+        std::vector<Command*> m_Commands;
+        Gamepad* m_Gamepad;
     };
 
     class Idle :
@@ -64,6 +68,17 @@ namespace dae{
     {
     public:
         ~Idle() = default;
+        void Enter(GameObject*)override;
+        void Execute(GameObject* gameObject)override;
+        void Exit(GameObject*) override;
+
+    };
+
+    class Tethered :
+        public State
+    {
+    public:
+        ~Tethered() = default;
         void Enter(GameObject*)override;
         void Execute(GameObject* gameObject)override;
         void Exit(GameObject*) override;

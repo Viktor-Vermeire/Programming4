@@ -14,12 +14,13 @@
 #include "SDLSoundSystem.h"
 #include "filesystem"
 #include "iostream"
+#include "SoundSystem.h"
 
 SDL_Window* g_window{};
 
 float dae::Minigin::DELTATIME = 0.f;
 std::mt19937 dae::Minigin::RANDOM(static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count()));
-
+std::unique_ptr<dae::SoundSystem> dae::ServiceLocator::_ss_instance{ std::make_unique<NullSoundSystem>() };
 void PrintSDLVersion()
 {
 	SDL_version version{};
@@ -110,7 +111,6 @@ void dae::Minigin::Run(const std::function<void()>& load)
 		}
 		doContinue = input.CheckExit();
 		sceneManager.Update();
-		ServiceLocator::get_SoundSystem().CleanupSoundThreads();
 		renderer.Render();
 		DELTATIME = 0;
 	}

@@ -6,6 +6,7 @@
 #include "FiniteStateMachineComponent.h"
 #include "iostream"
 #include "DigDugAttackComponent.h"
+#include "EnemyComponent.h"
 
 bool dae::HasMovementInput::IsMet(GameObject* gameObject)
 {
@@ -16,8 +17,17 @@ bool dae::HasMovementInput::IsMet(GameObject* gameObject)
     return false;
 }
 
+dae::HasNearbyHallway::HasNearbyHallway(float timeFloating): m_MinTimeFloating{timeFloating}
+{
+}
+
 bool dae::HasNearbyHallway::IsMet(GameObject* gameObject)
 {
+    auto comp = gameObject->GetComponent<FloatingComponent>();
+    if (comp) {
+        if (comp->GetTimeFloating() < m_MinTimeFloating)
+            return false;
+    }
 	auto parent = gameObject->GetParent();
 	if (parent) {
 		auto hallways = parent->GetComponent<HallwaysComponent>();
@@ -42,9 +52,9 @@ bool dae::HasValidDirection::IsMet(GameObject* gameObject)
             case RenderComponent::LEFT:
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x - 16, gameObject->GetWorldTransform().GetPosition().y, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
-                    std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x - 16 << " y: " << gameObject->GetWorldTransform().GetPosition().y << "\n";
-                    std::cout << "type: " << hallType << "\n";
-                    std::cout << "LEFT \n";
+                    //std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x - 16 << " y: " << gameObject->GetWorldTransform().GetPosition().y << "\n";
+                    //std::cout << "type: " << hallType << "\n";
+                    //std::cout << "LEFT \n";
                     return true;
                 }
                 break;
@@ -52,18 +62,18 @@ bool dae::HasValidDirection::IsMet(GameObject* gameObject)
 
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x + 16, gameObject->GetWorldTransform().GetPosition().y, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
-                    std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x + 16 << " y: " << gameObject->GetWorldTransform().GetPosition().y << "\n";
-                    std::cout << "type: " << hallType << "\n";
-                    std::cout << "RIGHT \n";
+                    //::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x + 16 << " y: " << gameObject->GetWorldTransform().GetPosition().y << "\n";
+                    //std::cout << "type: " << hallType << "\n";
+                    //std::cout << "RIGHT \n";
                     return true;
                 }
                 break;
             case RenderComponent::UP:
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x, gameObject->GetWorldTransform().GetPosition().y - 16, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
-                    std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x  << " y: " << gameObject->GetWorldTransform().GetPosition().y -16 << "\n";
-                    std::cout << "type: " << hallType << "\n";
-                    std::cout << "UP \n";
+                    //std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x  << " y: " << gameObject->GetWorldTransform().GetPosition().y -16 << "\n";
+                    //std::cout << "type: " << hallType << "\n";
+                    //std::cout << "UP \n";
                     return true;
                 }
                 break;
@@ -71,9 +81,9 @@ bool dae::HasValidDirection::IsMet(GameObject* gameObject)
                 
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x, gameObject->GetWorldTransform().GetPosition().y + 16, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
-                    std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x << " y: " << gameObject->GetWorldTransform().GetPosition().y +16 << "\n";
-                    std::cout << "type: " << hallType << "\n";
-                    std::cout << "DOWN \n";
+                    //::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x << " y: " << gameObject->GetWorldTransform().GetPosition().y +16 << "\n";
+                    //std::cout << "type: " << hallType << "\n";
+                    //std::cout << "DOWN \n";
                     return true;
                 }
                 break;
@@ -129,5 +139,23 @@ bool dae::FinishedAttack::IsMet(GameObject* gameObject)
     auto comp = gameObject->GetComponent<DigDugAttackComponent>();
     if (comp)
         return !comp->IsActive();
+    return false;
+}
+
+bool dae::IsTethered::IsMet(GameObject* gameObject)
+{
+    auto enemy = gameObject->GetComponent<dae::EnemyComponent>();
+    if (enemy) {
+        return enemy->GetTethered();
+    }
+    return false;
+}
+
+bool dae::IsUntethered::IsMet(GameObject* gameObject)
+{
+    auto enemy = gameObject->GetComponent<dae::EnemyComponent>();
+    if (enemy) {
+        return !enemy->GetTethered();
+    }
     return false;
 }

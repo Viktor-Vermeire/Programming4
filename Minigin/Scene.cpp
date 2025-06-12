@@ -1,6 +1,5 @@
 #include "Scene.h"
 #include "GameObject.h"
-
 #include <algorithm>
 
 
@@ -19,6 +18,16 @@ void dae::Scene::Add(std::shared_ptr<GameObject> object)
 void dae::Scene::Remove(std::shared_ptr<GameObject> object)
 {
 	m_objects.erase(std::remove(m_objects.begin(), m_objects.end(), object), m_objects.end());
+}
+
+void dae::Scene::Cleanup()
+{
+	auto it = m_objects.begin();
+	while ((it = std::find_if(it, m_objects.end(), [](std::shared_ptr <GameObject>& gameObject) {
+		return gameObject->IsToBeDeleted();
+		})) != m_objects.end()) {
+		m_objects.erase(std::remove(m_objects.begin(), m_objects.end(), *it), m_objects.end());
+	}
 }
 
 void dae::Scene::RemoveAll()
@@ -42,7 +51,7 @@ void dae::Scene::Render() const
 	}
 }
 
-std::string dae::Scene::GetName()
+std::string dae::Scene::GetName() const
 {
 	return m_name;
 }

@@ -42,25 +42,25 @@
 		return true;
 }*/
 
-bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad)
+bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad, std::vector<Command*> commands)
 {
 	const Uint8* pStates = SDL_GetKeyboardState(nullptr);
 	SDL_Event e;
 
-	for (int commandLooper{ 0 }; commandLooper < m_Commands.size(); ++commandLooper) {
+	for (int commandLooper{ 0 }; commandLooper < commands.size(); ++commandLooper) {
 		bool gamepadUsed = gamepad->IsUsed();
-		bool gamepadCommand = m_Commands.at(commandLooper)->IsUsingGamepad();
+		bool gamepadCommand = commands.at(commandLooper)->IsUsingGamepad();
 		if (gamepadUsed != gamepadCommand)
 			continue;
 		if (gamepad->IsUsed()) {
 			gamepad->Update();
-			if (gamepad->IsPressed(m_Commands.at(commandLooper)->GetInputValue())) {
-				m_Commands.at(commandLooper)->execute(*player);
+			if (gamepad->IsPressed(commands.at(commandLooper)->GetInputValue())) {
+				commands.at(commandLooper)->execute(*player);
 			}
 		}
 		else {
-			if (pStates[m_Commands.at(commandLooper)->GetInputValue()]) {
-				m_Commands.at(commandLooper)->execute(*player);
+			if (pStates[commands.at(commandLooper)->GetInputValue()]) {
+			commands.at(commandLooper)->execute(*player);
 			}
 			ImGui_ImplSDL2_ProcessEvent(&e);
 		}
@@ -74,9 +74,9 @@ bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad)
 }
 
 
-void dae::InputManager::AddGamepad(std::unique_ptr<Gamepad> gamepad)
+void dae::InputManager::AddGamepad(std::string key, std::unique_ptr<Gamepad> gamepad)
 {
-	m_GamePads.emplace_back(std::move(gamepad));
+	m_GamePads[key] = (std::move(gamepad));
 }
 
 void dae::InputManager::AddGameActor(GameObject* gameActor)
@@ -89,6 +89,16 @@ int dae::InputManager::GetGameActorSize() {
 }
 std::vector<dae::GameObject*> dae::InputManager::GetPlayers() {
 	return m_GameActors;
+}
+
+dae::Command* dae::InputManager::GetCommand(std::string key)
+{
+	return m_Commands[key].get();
+}
+
+dae::Gamepad* dae::InputManager::GetGamePad(std::string key)
+{
+	return m_GamePads[key].get();
 }
 
 bool dae::InputManager::CheckExit()

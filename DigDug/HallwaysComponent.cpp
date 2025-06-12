@@ -70,15 +70,20 @@ glm::vec3 dae::HallwaysComponent::GetFreeHallwayLocation(const glm::vec3 locatio
 {
 	_int64 yindex = static_cast<_int64>(std::round(location.y / 16));
 	_int64 xindex = static_cast<_int64>(std::round(location.x / 16));
+	if (m_Hallways[yindex][xindex] != FILLED) {
+		return glm::vec3{ xindex * 16,yindex * 16, 0 };
+	}
 	yindex--;
 	xindex++;
+	
 	for (int looper{ 0 }; looper < 3; ++looper) {
 		xindex -= 2;
 		for (int innerlooper{ 0 }; innerlooper < 3; ++innerlooper) {
-			if (m_Hallways[yindex][xindex] != FILLED) {
+			if (m_Hallways[yindex][++xindex] != FILLED) {
 				return glm::vec3{ xindex * 16,yindex * 16, 0 };
 			}
 		}
+		++yindex;
 	}
 	//Als Ik ooit hier kom, big problem
 	return glm::vec3();

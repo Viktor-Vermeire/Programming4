@@ -5,6 +5,7 @@
 #include "BaseComponent.h"
 #include "unordered_map"
 #include "Transform.h"
+#include "algorithm"
 
 namespace dae
 {
@@ -33,16 +34,12 @@ namespace dae
 		}
 
 		template<class ComponentType>
-		bool IsComponentPresent()
+		bool IsComponentPresent() const
 		{
 			static_assert(std::is_base_of<BaseComponent, ComponentType>::value, "ComponentType must be derived from BaseComponent");
-			for (int looper{ 0 }; looper < m_Components.size(); ++looper)
-			{
-				if (ComponentType* derivedComponent = dynamic_cast<ComponentType*>(m_Components.at(looper).get())) {
-					return true;
-				}
-			}
-			return false;
+			return std::any_of(m_Components.begin(), m_Components.end(), [](const std::unique_ptr<BaseComponent>& component) {
+				return dynamic_cast<ComponentType*>(component.get()) != nullptr;});
+
 		}
 
 		template<class ComponentType>
@@ -69,6 +66,8 @@ namespace dae
 		void CleanupComponents();
 		void SetWorldTransformOutdated();
 		void UpdateWorldTransform();
+		bool IsToBeDeleted();
+		void SetToBeDeleted(bool value);
 		
 
 		GameObject();
@@ -87,6 +86,7 @@ namespace dae
 		bool m_IsWorldTransformOutdated;
 		std::vector<GameObject*> m_Children;
 		std::vector<std::unique_ptr<BaseComponent>> m_Components{};
+		bool m_ToBeDeleted;
 
 	};
 }

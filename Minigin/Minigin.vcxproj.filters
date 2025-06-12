@@ -171,6 +171,9 @@
     <ClInclude Include="Condition.h">
       <Filter>Header Files\Conditions</Filter>
     </ClInclude>
+    <ClInclude Include="TextComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\3rdParty\imgui-1.91.8\imgui.cpp">

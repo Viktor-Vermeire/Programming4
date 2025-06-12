@@ -159,6 +159,7 @@
     <ClCompile Include="FloatingComponent.cpp" />
     <ClCompile Include="HallwaysComponent.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
+    <ClCompile Include="HealthObserver.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Move.cpp" />
     <ClCompile Include="MovementComponent.cpp" />
@@ -166,8 +167,11 @@
     <ClCompile Include="PlayerComponent.cpp" />
     <ClCompile Include="PlayerInfoComponent.cpp" />
     <ClCompile Include="PlaySound.cpp" />
+    <ClCompile Include="Pump.cpp" />
     <ClCompile Include="RockComponent.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
+    <ClCompile Include="ScoreObserver.cpp" />
+    <ClCompile Include="SelectModeCommand.cpp" />
     <ClCompile Include="States.cpp" />
     <ClCompile Include="Suicide.cpp" />
   </ItemGroup>
@@ -180,6 +184,7 @@
     <ClInclude Include="FloatingComponent.h" />
     <ClInclude Include="HallwaysComponent.h" />
     <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="HealthObserver.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MovementComponent.h" />
     <ClInclude Include="Pickup.h" />
@@ -187,12 +192,22 @@
     <ClInclude Include="PlayerInfoComponent.h" />
     <ClInclude Include="PlayerState.h" />
     <ClInclude Include="PlaySound.h" />
+    <ClInclude Include="Pump.h" />
     <ClInclude Include="RockComponent.h" />
     <ClInclude Include="RotatorComponent.h" />
+    <ClInclude Include="ScoreObserver.h" />
+    <ClInclude Include="SelectModeCommand.h" />
     <ClInclude Include="States.h" />
     <ClInclude Include="Suicide.h" />
   </ItemGroup>
   <ItemGroup>
+    <Media Include="..\Data\DigDug_SoundEffects\03 Stage Finale.mp3" />
+    <Media Include="..\Data\DigDug_SoundEffects\04 Factory [Area 2].mp3" />
+    <Media Include="..\Data\DigDug_SoundEffects\05 Desert [Area 3].mp3" />
+    <Media Include="..\Data\DigDug_SoundEffects\09 Boss Land.mp3" />
+    <Media Include="..\Data\DigDug_SoundEffects\10 Spurt.mp3" />
+    <Media Include="..\Data\DigDug_SoundEffects\12 Credits Roll.mp3" />
+    <Media Include="..\Data\DigDug_SoundEffects\All_Clear.mp3" />
     <Media Include="..\Data\DigDug_SoundEffects\boss_fygar_firebreath.wav" />
     <Media Include="..\Data\DigDug_SoundEffects\coin_credit.wav" />
     <Media Include="..\Data\DigDug_SoundEffects\enemy_killed1.wav" />
@@ -208,6 +223,7 @@
     <Media Include="..\Data\DigDug_SoundEffects\island_emerging.wav" />
     <Media Include="..\Data\DigDug_SoundEffects\life_lost.wav" />
     <Media Include="..\Data\DigDug_SoundEffects\marble_travel.wav" />
+    <Media Include="..\Data\DigDug_SoundEffects\Mother_Nature.mp3" />
     <Media Include="..\Data\DigDug_SoundEffects\powerup_item.wav" />
     <Media Include="..\Data\DigDug_SoundEffects\pump.wav" />
     <Media Include="..\Data\DigDug_SoundEffects\pump_fire.wav" />

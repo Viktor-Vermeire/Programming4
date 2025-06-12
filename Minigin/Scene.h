@@ -1,21 +1,40 @@
 #pragma once
 #include "SceneManager.h"
+#include "GameObject.h"
 
 namespace dae
 {
-	class GameObject;
 	class Scene final
 	{
 		friend Scene& SceneManager::CreateScene(const std::string& name);
 	public:
 		void Add(std::shared_ptr<GameObject> object);
 		void Remove(std::shared_ptr<GameObject> object);
+		void Cleanup();
 
 		void RemoveAll();
 
+		
+
+
+
 		void Update();
 		void Render() const;
-		std::string GetName();
+		std::string GetName() const;
+
+		template <typename ComponentType>
+		std::vector<GameObject*> findGameObjectsWithComponent() {
+			std::vector<GameObject*> result;
+
+			auto it = m_objects.begin();
+			while ((it = std::find_if(it, m_objects.end(), [](std::shared_ptr <GameObject>& gameObject) {
+				return gameObject->IsComponentPresent<ComponentType>();
+				})) != m_objects.end()) {
+				result.push_back(it->get());
+				++it;
+			}
+			return result;
+		}
 
 		~Scene();
 		Scene(const Scene& other) = delete;

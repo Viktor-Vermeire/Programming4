@@ -5,6 +5,7 @@
 #include <SDL_mixer.h> 
 #include "vector"
 #include "filesystem"
+#include "queue"
 
 namespace dae {
 	class SDLSoundSystemImpl;
@@ -13,9 +14,10 @@ namespace dae {
 	public:
 		SDLSoundSystem(const std::filesystem::path& dataPath);
 		
-		void AddEffect(std::vector<const char*> effects) override;
-		void play(const unsigned short id, const float volume) override;
-		void CleanupSoundThreads() override;
+		void AddEffects(std::vector<const char*> effects) override;
+		void AddSongs(std::vector<const char*> effects) override;
+		void PlayEffect(const unsigned short id, const float volume) override;
+		void PlayMusic(const unsigned short id, const float volume) override;
 		
 	private:
 		std::unique_ptr<SDLSoundSystemImpl> m_SDLSoundSystemImpl;

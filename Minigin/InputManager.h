@@ -13,24 +13,27 @@ namespace dae
 	{
 	public:
 		//bool ProcessInput();
-		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad);
-		void AddGamepad(std::unique_ptr<Gamepad> gamepad);
+		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad, std::vector<Command*> commands);
+		void AddGamepad(std::string key, std::unique_ptr<Gamepad> gamepad);
 		void AddGameActor(GameObject* gameActor);
 		//Command* GetCommand(std::string key);
 		int GetGameActorSize();
 		std::vector<GameObject*> GetPlayers();
+		Command* GetCommand(std::string key);
+		Gamepad* GetGamePad(std::string key);
 
 		bool CheckExit();
 
 		template <typename CommandType, typename... Args>
-		void AddCommand(Args&&... args) {
+		void AddCommand(std::string key,Args&&... args) {
 			static_assert(std::is_base_of<Command, CommandType>::value, "CommandType must be derived from Command");
-			m_Commands.push_back(std::make_unique<CommandType>(std::forward<Args>(args)...));
+			//m_Commands.push_back(std::make_unique<CommandType>(std::forward<Args>(args)...));
+			m_Commands[key] = (std::make_unique<CommandType>(std::forward<Args>(args)...));
 		}
 	private:
 		//std::vector<std::unique_ptr<Command>> m_Commands;
-		std::vector<std::unique_ptr<Gamepad>> m_GamePads;
-		std::vector<std::unique_ptr<Command>> m_Commands;
+		std::map<std::string,std::unique_ptr<Gamepad>> m_GamePads;
+		std::map<std::string ,std::unique_ptr<Command>> m_Commands;
 		std::vector<GameObject*> m_GameActors;
 	};
 

@@ -12,6 +12,7 @@
 dae::GameObject::GameObject()
 {
 	m_WorldTransform = dae::Transform();
+	m_ToBeDeleted = false;
 }
 
 dae::GameObject::~GameObject() = default;
@@ -120,4 +121,14 @@ void dae::GameObject::UpdateWorldTransform()
 		m_WorldTransform.SetPosition((m_LocalTransform.GetPosition().x + m_Parent->GetWorldTransform().GetPosition().x), (m_LocalTransform.GetPosition().y + m_Parent->GetWorldTransform().GetPosition().y), 0.0f);
 	}
 	m_IsWorldTransformOutdated = false;
+}
+
+bool dae::GameObject::IsToBeDeleted()
+{
+	return m_ToBeDeleted;
+}
+
+void dae::GameObject::SetToBeDeleted(bool value)
+{
+	m_ToBeDeleted = value;
 }

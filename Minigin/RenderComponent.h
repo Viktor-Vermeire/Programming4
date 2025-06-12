@@ -17,12 +17,14 @@ namespace dae {
         void SetTexture(const std::string& filename, SDL_Rect box);
         SDL_Rect GetBox();
         void SetBox(SDL_Rect box);
-        Direction GetDirection();
+        void SetDstBox(SDL_Rect box);
+        const Direction GetDirection();
         void Render() override;
         void SetDirection(Direction direction);
     private:
         std::shared_ptr<Texture2D> m_Texture{};
         SDL_Rect m_Box;
+        SDL_Rect m_DstBox;
         Direction m_Direction;
 
     };

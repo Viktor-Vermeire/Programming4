@@ -8,6 +8,8 @@
 #include "HallwaysComponent.h"
 #include "FiniteStateMachineComponent.h"
 #include "DigDugAttackComponent.h"
+#include "Command.h"
+#include "Gamepad.h"
 
 void dae::Attacking::Enter(GameObject*)
 {
@@ -75,6 +77,11 @@ void dae::FloatingToPlayer::Exit(GameObject*)
 {
 }
 
+float dae::FloatingToPlayer::GetTimeInState()
+{
+	return m_TimeInState;
+}
+
 dae::FloatingToGrid::FloatingToGrid(std::vector<SDL_Rect> animationLocations, float timePerFrame) :
 	m_AnimationLocations{ animationLocations }, m_TimePerFrame{ timePerFrame }
 {
@@ -122,9 +129,16 @@ void dae::FloatingToGrid::Exit(GameObject* gameObject)
 		comp->SetTimeInCurrentSituation(0.f);
 }
 
-void dae::Idle::Enter(GameObject*)
+void dae::Idle::Enter(GameObject* gameObject)
 {
-
+	auto parent = gameObject->GetParent();
+	if (parent) {
+		auto hall = parent->GetComponent<dae::HallwaysComponent>();
+		if (hall) {
+			auto pos = hall->GetFreeHallwayLocation(gameObject->GetWorldTransform().GetPosition());
+			gameObject->SetPosition(pos.x, pos.y);
+		}
+	}
 }
 
 void dae::Idle::Execute(GameObject* gameObject)
@@ -179,9 +193,12 @@ void dae::Running::Exit(GameObject* gameObject)
 	}
 }
 
-dae::DigDugAttack::DigDugAttack()
+dae::DigDugAttack::DigDugAttack(Gamepad* gamepad)
 {
+	m_Gamepad = gamepad;
 }
+
+
 
 void dae::DigDugAttack::Enter(GameObject* gameObject)
 {
@@ -192,10 +209,31 @@ void dae::DigDugAttack::Enter(GameObject* gameObject)
 	}
 }
 
-void dae::DigDugAttack::Execute(GameObject*)
+void dae::DigDugAttack::Execute(GameObject* gameobject)
 {
+	auto comp = gameobject->GetComponent<dae::DigDugAttackComponent>();
+	if (comp)
+		comp->LowerCoolDown();
+	InputManager::GetInstance().ProcessPlayerInput(gameobject, m_Gamepad, m_Commands);
 }
 
 void dae::DigDugAttack::Exit(GameObject*)
+{
+}
+
+void dae::DigDugAttack::AddCommand(Command* command)
+{
+	m_Commands.emplace_back(command);
+}
+
+void dae::Tethered::Enter(GameObject*)
+{
+}
+
+void dae::Tethered::Execute(GameObject*)
+{
+}
+
+void dae::Tethered::Exit(GameObject*)
 {
 }

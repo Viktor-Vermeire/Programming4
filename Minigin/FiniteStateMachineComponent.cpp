@@ -83,7 +83,7 @@ void dae::FiniteStateMachineComponent::Update()
 			m_CurrentState->Exit(GetOwner());
 			option.second->Enter(GetOwner());
 			m_CurrentState = option.second;
-			std::cout << typeid(*option.second).name() << "\n";
+			//std::cout << typeid(*option.second).name() << "\n";
 			break;
 		}
 	}

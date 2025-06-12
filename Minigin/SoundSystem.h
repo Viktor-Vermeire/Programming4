@@ -5,9 +5,10 @@ namespace dae {
 	{
 	public:
 		virtual ~SoundSystem() = default;
-		virtual void play(const unsigned short id, const float volume) = 0;
-		virtual void AddEffect(std::vector<const char*> effects) = 0;
-		virtual void CleanupSoundThreads() = 0;
+		virtual void PlayEffect(const unsigned short id, const float volume) = 0;
+		virtual void PlayMusic(const unsigned short id, const float volume) = 0;
+		virtual void AddEffects(std::vector<const char*> effects) = 0;
+		virtual void AddSongs(std::vector<const char*> effects) = 0;
 		// ...and other relevant methods of course...
 	};
 }

@@ -14,9 +14,15 @@ namespace dae
 
 		void Update();
 		void Render();
+		void SetActiveScene(Scene& scene);
+		void SetToSwitchScene(Scene& scene);
+		Scene* GetActiveScene();
+		Scene* GetScene(std::string name);
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;
+		Scene* m_ActiveScene;
+		Scene* m_ToSwitchScene{};
 		std::vector<std::shared_ptr<Scene>> m_scenes;
 	};
 }

@@ -12,8 +12,10 @@ namespace dae {
     class HasNearbyHallway : public Condition
     {
     public:
-        HasNearbyHallway() = default;
+        HasNearbyHallway(float timeFloating);
         bool IsMet(GameObject* gameObject);
+    private:
+        float m_MinTimeFloating;
     };
 
     class HasValidDirection :
@@ -64,5 +66,20 @@ namespace dae {
         FinishedAttack() = default;
         bool IsMet(GameObject* gameObject);
     };
+    class IsTethered :
+        public Condition
+    {
+    public:
+        IsTethered() = default;
+        bool IsMet(GameObject* gameObject);
+    };
+    class IsUntethered :
+        public Condition
+    {
+    public:
+        IsUntethered() = default;
+        bool IsMet(GameObject* gameObject);
+    };
+
 }
 

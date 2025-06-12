@@ -14,7 +14,9 @@ namespace dae {
         void SetPlayerTarget(GameObject* target);
         void SetInGrid(bool value);
         bool InGrid();
+        float GetTimeFloating();
     private:
+        float m_TimeFloating;
         float m_MovementSpeed;
         GameObject* m_Target;
         glm::vec3 m_GridTarget;

@@ -37,6 +37,9 @@
     <Filter Include="Source Files\Conditions">
       <UniqueIdentifier>{55ed1bcc-cb43-475e-afe2-71efa4f6cdb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Observers">
+      <UniqueIdentifier>{82346767-33bc-4c9e-877b-e692a1a77445}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -94,6 +97,18 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="DigDugAttackCommand.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Pump.cpp">
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreObserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HealthObserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectModeCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -153,7 +168,19 @@
       <Filter>Header Files\States</Filter>
     </ClInclude>
     <ClInclude Include="DigDugAttackCommand.h">
+      <Filter>Header Files\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Pump.h">
+      <Filter>Header Files\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreObserver.h">
+      <Filter>Header Files\Observers</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthObserver.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SelectModeCommand.h">
+      <Filter>Header Files\Commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -242,6 +269,30 @@
       <Filter>Resource Files</Filter>
     </Media>
     <Media Include="..\Data\fireball.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\03 Stage Finale.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\04 Factory [Area 2].mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\05 Desert [Area 3].mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\09 Boss Land.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\10 Spurt.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\12 Credits Roll.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\All_Clear.mp3">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="..\Data\DigDug_SoundEffects\Mother_Nature.mp3">
       <Filter>Resource Files</Filter>
     </Media>
   </ItemGroup>
