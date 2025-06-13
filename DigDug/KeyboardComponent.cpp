@@ -4,6 +4,9 @@
 #include "Minigin.h"
 #include "iostream"
 #include "TextComponent.h"
+#include "SceneManager.h"
+#include "Scene.h"
+#include "PlayerComponent.h"
 
 dae::KeyboardComponent::KeyboardComponent(GameObject& gameObject, float inputCoolDown): BaseComponent(gameObject), m_InputCooldown{inputCoolDown}
 {
@@ -59,8 +62,9 @@ void dae::KeyboardComponent::ConfirmLetter()
 	auto check = GetKeyLocation(static_cast<int>(std::round(m_HighlightedLetter.first)), static_cast<int>(std::round(m_HighlightedLetter.second))).value;
 	m_SavedString.append(check);
 	auto textRender = GetOwner()->GetComponent<dae::TextComponent>();
-	if (textRender)
+	if (textRender) {
 		textRender->SetText(m_SavedString);
+	}
 }
 
 void dae::KeyboardComponent::Render()

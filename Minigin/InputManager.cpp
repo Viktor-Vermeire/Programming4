@@ -54,7 +54,7 @@ bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad,
 			continue;
 		if (gamepad->IsUsed()) {
 			gamepad->Update();
-			if (gamepad->IsPressed(commands.at(commandLooper)->GetInputValue())) {
+			if (gamepad->IsPressed(commands.at(commandLooper)->GetInputValue()) && gamepad->Connected()) {
 				commands.at(commandLooper)->execute(*player);
 			}
 		}
@@ -83,14 +83,14 @@ dae::Gamepad* dae::InputManager::GetGamePad(std::string key) {
 	return m_GamePads[key].get();
 }
 
-std::shared_ptr<dae::GameObject> dae::InputManager::GetGameActor(std::string key)
+dae::GameObject* dae::InputManager::GetGameActor(std::string key)
 {
-	return m_GameActors[key];
+	return m_GameActors[key].get();
 }
 
-void dae::InputManager::AddGameActor(std::string key,std::shared_ptr<GameObject> gameActor)
+void dae::InputManager::AddGameActor(std::string key,std::unique_ptr<GameObject> gameActor)
 {
-	m_GameActors[key] = gameActor;
+	m_GameActors[key] = (std::move(gameActor));
 }
 
 int dae::InputManager::GetGameActorSize() {

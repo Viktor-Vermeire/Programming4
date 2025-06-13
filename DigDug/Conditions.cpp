@@ -45,7 +45,8 @@ bool dae::HasValidDirection::IsMet(GameObject* gameObject)
 {
     auto comp = gameObject->GetComponent<RenderComponent>();
     auto parent = gameObject->GetParent();
-    if (comp && parent) {
+    auto movement = gameObject->GetComponent<dae::MovementComponent>();
+    if (comp && parent && movement) {
         auto hallways = parent->GetComponent<HallwaysComponent>();
         if (hallways) {
             dae::HallwaysComponent::HallwayType hallType;
@@ -53,20 +54,24 @@ bool dae::HasValidDirection::IsMet(GameObject* gameObject)
             case RenderComponent::LEFT:
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x - 16, gameObject->GetWorldTransform().GetPosition().y, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
-                    //std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x - 16 << " y: " << gameObject->GetWorldTransform().GetPosition().y << "\n";
-                    //std::cout << "type: " << hallType << "\n";
-                    //std::cout << "LEFT \n";
-                    return true;
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return valid;
                 }
                 break;
             case RenderComponent::RIGHT:
-
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x + 16, gameObject->GetWorldTransform().GetPosition().y, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
                     //::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x + 16 << " y: " << gameObject->GetWorldTransform().GetPosition().y << "\n";
                     //std::cout << "type: " << hallType << "\n";
                     //std::cout << "RIGHT \n";
-                    return true;
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return valid;
                 }
                 break;
             case RenderComponent::UP:
@@ -75,17 +80,24 @@ bool dae::HasValidDirection::IsMet(GameObject* gameObject)
                     //std::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x  << " y: " << gameObject->GetWorldTransform().GetPosition().y -16 << "\n";
                     //std::cout << "type: " << hallType << "\n";
                     //std::cout << "UP \n";
-                    return true;
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return valid;
                 }
                 break;
             case RenderComponent::DOWN:
-                
                 hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x, gameObject->GetWorldTransform().GetPosition().y + 16, 0 });
                 if (hallType != HallwaysComponent::FILLED) {
                     //::cout << "x:" << gameObject->GetWorldTransform().GetPosition().x << " y: " << gameObject->GetWorldTransform().GetPosition().y +16 << "\n";
                     //std::cout << "type: " << hallType << "\n";
                     //std::cout << "DOWN \n";
-                    return true;
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return valid;
                 }
                 break;
             }
@@ -174,5 +186,61 @@ bool dae::FygarFinishedAttack::IsMet(GameObject* gameObject)
     auto comp = gameObject->GetComponent<FygarAttackComponent>();
     if (comp)
         return !comp->IsActive();
+    return false;
+}
+
+bool dae::HasValidDirectionAndWantsToMove::IsMet(GameObject* gameObject)
+{
+    auto comp = gameObject->GetComponent<RenderComponent>();
+    auto parent = gameObject->GetParent();
+    auto movement = gameObject->GetComponent<dae::MovementComponent>();
+    if (comp && parent && movement) {
+        auto hallways = parent->GetComponent<HallwaysComponent>();
+        if (hallways) {
+            dae::HallwaysComponent::HallwayType hallType;
+            switch (comp->GetDirection()) {
+            case RenderComponent::LEFT:
+                hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x - 16, gameObject->GetWorldTransform().GetPosition().y, 0 });
+                if (hallType != HallwaysComponent::FILLED) {
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return (valid && wantsToMove);
+                }
+                break;
+            case RenderComponent::RIGHT:
+                hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x + 16, gameObject->GetWorldTransform().GetPosition().y, 0 });
+                if (hallType != HallwaysComponent::FILLED) {
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return (valid && wantsToMove);
+                }
+                break;
+            case RenderComponent::UP:
+                hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x, gameObject->GetWorldTransform().GetPosition().y - 16, 0 });
+                if (hallType != HallwaysComponent::FILLED) {
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return (valid && wantsToMove);
+                }
+                break;
+            case RenderComponent::DOWN:
+                hallType = hallways->GetHallwayType({ gameObject->GetWorldTransform().GetPosition().x, gameObject->GetWorldTransform().GetPosition().y + 16, 0 });
+                if (hallType != HallwaysComponent::FILLED) {
+                    auto wantsToMove = movement->WantsToMove();
+                    movement->Move(comp->GetDirection());
+                    auto valid = movement->WantsToMove();
+                    movement->SetWantsToMove(wantsToMove);
+                    return (valid && wantsToMove);
+                }
+                break;
+            }
+        }
+    }
     return false;
 }

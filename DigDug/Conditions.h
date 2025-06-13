@@ -26,6 +26,14 @@ namespace dae {
         bool IsMet(GameObject* gameObject);
     };
 
+    class HasValidDirectionAndWantsToMove :
+        public Condition
+    {
+    public:
+        HasValidDirectionAndWantsToMove() = default;
+        bool IsMet(GameObject* gameObject);
+    };
+
     class IsDoneRunning : public Condition
     {
     public:

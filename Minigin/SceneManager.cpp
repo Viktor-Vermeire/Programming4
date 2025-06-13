@@ -11,8 +11,9 @@ void dae::SceneManager::Update()
 	m_ActiveScene->Update();
 	m_ActiveScene->Cleanup();
 	if (m_ToSwitchScene != nullptr) {
+		auto temp = m_ActiveScene;
 		m_ActiveScene = m_ToSwitchScene;
-		m_ActiveScene->ExecuteStartUpFunctor();
+		m_ActiveScene->ExecuteStartUpFunctor(temp);
 		m_ToSwitchScene = nullptr;
 	}
 }

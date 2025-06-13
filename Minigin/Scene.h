@@ -4,6 +4,7 @@
 #include "functional"
 #include "vector"
 
+
 namespace dae
 {
 	struct StartUpInfo {
@@ -13,16 +14,17 @@ namespace dae
 	{
 		friend Scene& SceneManager::CreateScene(const std::string& name);
 	public:
-		void Add(std::shared_ptr<GameObject> object);
-		void Remove(std::shared_ptr<GameObject> object);
+		void Add(std::unique_ptr<GameObject> object);
+		void Add(GameObject* gameObject);
+		void Remove(GameObject* object);
 		void Cleanup();
 
 		void RemoveAll();
 
 		void Update();
-		void SetStartUpFunctor(std::function<void()>* functor, const StartUpInfo& startUpInfo);
+		void SetStartUpFunctor(std::function<void(Scene*)>* functor, const StartUpInfo& startUpInfo);
 		StartUpInfo& GetStartUpInfo();
-		void ExecuteStartUpFunctor();
+		void ExecuteStartUpFunctor(Scene* previousScene);
 		void Render() const;
 		std::string GetName() const;
 
@@ -30,11 +32,11 @@ namespace dae
 		std::vector<GameObject*> findGameObjectsWithComponent() {
 			std::vector<GameObject*> result;
 
-			auto it = m_objects.begin();
-			while ((it = std::find_if(it, m_objects.end(), [](std::shared_ptr <GameObject>& gameObject) {
+			auto it = m_Objects.begin();
+			while ((it = std::find_if(it, m_Objects.end(), [](GameObject* gameObject) {
 				return gameObject->IsComponentPresent<ComponentType>();
-				})) != m_objects.end()) {
-				result.push_back(it->get());
+				})) != m_Objects.end()) {
+				result.push_back(*it);
 				++it;
 			}
 			return result;
@@ -49,11 +51,12 @@ namespace dae
 	private: 
 		explicit Scene(const std::string& name);
 
-		std::unique_ptr<std::function<void()>> m_StartUpFunctor;
+		std::unique_ptr<std::function<void(Scene*)>> m_StartUpFunctor;
 
 		std::string m_name;
 		StartUpInfo m_StartupInfo;
-		std::vector < std::shared_ptr<GameObject>> m_objects{};
+		std::vector < std::unique_ptr<GameObject>> m_BoundObjects{};
+		std::vector <GameObject*> m_Objects;
 
 		static unsigned int m_idCounter; 
 	};

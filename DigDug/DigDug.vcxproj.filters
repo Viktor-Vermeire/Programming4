@@ -132,6 +132,9 @@
     <ClCompile Include="KeyboardCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SaveScoreCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Move.h">
@@ -223,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="KeyboardCommand.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveScoreCommand.h">
+      <Filter>Header Files\Commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

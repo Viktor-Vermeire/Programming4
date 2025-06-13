@@ -51,8 +51,8 @@ public:
 		}
 		else
 		{
-			m_ButtonsPressedThisFrame = -1;
-			m_ButtonsReleasedThisFrame = -1;
+			m_ButtonsPressedThisFrame = 0;
+			m_ButtonsReleasedThisFrame = 0;
 			// Controller is not connected
 		}
 	}
