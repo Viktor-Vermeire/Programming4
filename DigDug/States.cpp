@@ -32,7 +32,9 @@ void dae::FloatingToPlayer::Enter(GameObject* gameObject)
 {
 	m_TimeInState = 0;
 	auto floating = gameObject->GetComponent<FloatingComponent>();
-	if (floating) {
+	auto render = gameObject->GetComponent<RenderComponent>();
+	if (floating && render) {
+		render->SetDirection(RenderComponent::RIGHT);
 		GameObject* closestPlayer = nullptr;
 		for (auto player : InputManager::GetInstance().GetPlayers()) {
 			if (closestPlayer == nullptr)
@@ -168,6 +170,12 @@ void dae::Idle::Exit(GameObject*)
 {
 }
 
+dae::Running::Running(std::vector<SDL_Rect> animationLocations, float timePerFrame): 
+	m_AnimationLocations{animationLocations}, m_TimePerFrame{timePerFrame}
+{
+	m_TimeInState = 0;
+}
+
 void dae::Running::Enter(GameObject* gameObject)
 {
 	auto movement = gameObject->GetComponent<MovementComponent>();
@@ -179,9 +187,17 @@ void dae::Running::Enter(GameObject* gameObject)
 }
 void dae::Running::Execute(GameObject* gameObject)
 {
+	m_TimeInState += Minigin::DELTATIME;
+	if (m_TimeInState > m_AnimationLocations.size() * m_TimePerFrame)
+		m_TimeInState -= (m_AnimationLocations.size() * m_TimePerFrame);
 	auto movement = gameObject->GetComponent<MovementComponent>();
-	if (movement != nullptr) {
+	auto render = gameObject->GetComponent<RenderComponent>();
+	if (movement != nullptr && render) {
 		movement->ExecuteMove();
+		auto result = fmodf(m_TimeInState, m_TimePerFrame);
+		auto castedtimeperframe = ((m_TimeInState - (result)) / m_TimePerFrame);
+		auto check = static_cast<_int64>(castedtimeperframe);
+		render->SetBox(m_AnimationLocations[check]);
 	}
 }
 
@@ -235,5 +251,17 @@ void dae::Tethered::Execute(GameObject*)
 }
 
 void dae::Tethered::Exit(GameObject*)
+{
+}
+
+void dae::FygarAttack::Enter(GameObject*)
+{
+}
+
+void dae::FygarAttack::Execute(GameObject*)
+{
+}
+
+void dae::FygarAttack::Exit(GameObject*)
 {
 }

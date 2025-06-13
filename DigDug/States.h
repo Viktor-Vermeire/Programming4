@@ -19,9 +19,15 @@ namespace dae{
 
 	class Running : public State
 	{
+    public:
+        Running(std::vector<SDL_Rect> animationLocations, float timePerFrame);
 		void Enter(GameObject* gameObject) override;
 		void Execute(GameObject* gameObject) override;
 		void Exit(GameObject* gameObject) override;
+    private:
+        float m_TimePerFrame = 0;
+        float m_TimeInState = 0;
+        std::vector<SDL_Rect> m_AnimationLocations;
 	};
 
     class FloatingToPlayer : public State
@@ -61,6 +67,14 @@ namespace dae{
     private:
         std::vector<Command*> m_Commands;
         Gamepad* m_Gamepad;
+    };
+
+    class FygarAttack : public State {
+    public:
+        void Enter(GameObject*) override;
+        void Execute(GameObject*) override;
+        void Exit(GameObject*) override;
+    private:
     };
 
     class Idle :

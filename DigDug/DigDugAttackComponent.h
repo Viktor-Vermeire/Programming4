@@ -18,6 +18,7 @@ namespace dae {
         void Update() override;
         void Render() override;
     private:
+        SDL_Rect GetWorldSpikeRectCollision(RenderComponent& render);
         SDL_Rect GetWorldSpikeRect(RenderComponent& render);
         bool m_Active;
         bool m_Growing;

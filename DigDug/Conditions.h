@@ -66,6 +66,24 @@ namespace dae {
         FinishedAttack() = default;
         bool IsMet(GameObject* gameObject);
     };
+
+    class FygarWantsToAttack :
+    public Condition
+    {
+    public:
+        FygarWantsToAttack() = default;
+        bool IsMet(GameObject* gameObject);
+    };
+
+    class FygarFinishedAttack :
+        public Condition
+    {
+    public:
+        FygarFinishedAttack() = default;
+        bool IsMet(GameObject* gameObject);
+    };
+
+    
     class IsTethered :
         public Condition
     {

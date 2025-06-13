@@ -97,6 +97,10 @@ void dae::Renderer::RenderTextureOriented(const Texture2D& texture, const SDL_Re
 		center = SDL_Point{ dst.w / 2,dst.h / 2 }; 
 	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst, angle, &center, flip);
 }
+//test
+void dae::Renderer::RenderRect(SDL_Rect rect) {
+	SDL_RenderFillRect(GetSDLRenderer(), &rect);
+}
 
 SDL_Window* dae::Renderer::GetSDLWindow()
 {

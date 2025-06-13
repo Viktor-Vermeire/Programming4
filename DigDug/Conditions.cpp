@@ -7,6 +7,7 @@
 #include "iostream"
 #include "DigDugAttackComponent.h"
 #include "EnemyComponent.h"
+#include "FygarAttackComponent.h"
 
 bool dae::HasMovementInput::IsMet(GameObject* gameObject)
 {
@@ -157,5 +158,21 @@ bool dae::IsUntethered::IsMet(GameObject* gameObject)
     if (enemy) {
         return !enemy->GetTethered();
     }
+    return false;
+}
+
+bool dae::FygarWantsToAttack::IsMet(GameObject* gameObject)
+{
+    auto comp = gameObject->GetComponent<FygarAttackComponent>();
+    if (comp)
+        return comp->IsActive();
+    return false;
+}
+
+bool dae::FygarFinishedAttack::IsMet(GameObject* gameObject)
+{
+    auto comp = gameObject->GetComponent<FygarAttackComponent>();
+    if (comp)
+        return !comp->IsActive();
     return false;
 }

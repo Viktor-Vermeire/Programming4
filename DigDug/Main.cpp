@@ -41,6 +41,8 @@
 #include "Pump.h"
 #include "SelectModeCommand.h"
 #include "SDLSoundSystem.h"
+#include "FygarAttackComponent.h"
+#include "FygarAttackCommand.h"
 
 namespace fs = std::filesystem;
 
@@ -59,6 +61,8 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::Pump>("GamepadPump", 4096, true);
 	input.AddCommand<dae::DigDugAttackCommand>("KeyboardShootTether",SDL_SCANCODE_E, false);
 	input.AddCommand<dae::DigDugAttackCommand>("GamepadShootTether", 4096, true);
+	input.AddCommand<dae::FygarAttackCommand>("GamepadFygarAttack", 4096, true);
+	input.AddCommand<dae::FygarAttackCommand>("KeyboardFygarAttack", SDL_SCANCODE_E, false);
 
 	input.AddCommand<dae::Suicide>("GamepadSuicide", 32768, true);
 	input.AddCommand<dae::Suicide>("KeyboardSuicide", SDL_SCANCODE_C, false);
@@ -70,7 +74,7 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::PlaySound>("GamepadPlaySound", 4096, true, 0);
 
 	input.AddCommand<dae::SelectModeCommand>("SelectModeSingle", 4096, true, "Single", 1);
-	input.AddCommand<dae::SelectModeCommand>("SelectModeCoop", 8192, true, "Coop", 1);
+	input.AddCommand<dae::SelectModeCommand>("SelectModeCoop", 8192, true, "Coop", 2);
 	input.AddCommand<dae::SelectModeCommand>("SelectModePvP", 16384, true, "PvP", 1);
 
 	/*input.AddCommand<dae::Move>(1, true, dae::RenderComponent::UP);
@@ -96,11 +100,23 @@ void InitializeCommands(dae::InputManager& input)
 struct PlayerInfo {
 	std::string texturePath;
 	SDL_Rect textureSrcRect;
+	std::vector<SDL_Rect> runningAnimLocations;
 	int startPos[2];
 	std::string name;
 	dae::Scene& scene; 
 	dae::GameObject* hallways;
 	dae::GameObject* playerStatDisplay;
+};
+struct FygarPlayerInfo {
+	std::string texturePath;
+	SDL_Rect textureSrcRect;
+	std::vector<SDL_Rect> runningAnimLocations;
+	int startPos[2];
+	std::string name;
+	dae::Scene& scene;
+	dae::GameObject* hallways;
+	dae::GameObject* playerStatDisplay;
+	std::vector<SDL_Rect> fygarFlameRects;
 };
 struct ControllerInfo {
 	bool usesGamePad; 
@@ -111,9 +127,19 @@ struct ScoreInfo {
 	std::shared_ptr<dae::Font> font; 
 	std::shared_ptr<dae::GameObject> scoreBoardGo;
 };
+struct EnemyInfo {
+	std::string texturePath;
+	SDL_Rect textureSrcRect;
+	int startPos[2];
+	std::vector<SDL_Rect> runningAnimLocations;
+	std::vector<SDL_Rect> floatingAnimLocations;
+	dae::Scene& scene;
+	dae::GameObject* hallways;
+	std::vector<SDL_Rect> fygarFlameRects;
+};
+
 
 void SetupPlayer(const PlayerInfo& playerInfo, const ControllerInfo& controllerInfo, const ScoreInfo&) {
-	auto go = std::make_shared<dae::GameObject>();
 
 	/*auto PlayerLivesGo = std::make_shared<dae::GameObject>();
 	PlayerLivesGo->SetParent(scoreInfo.scoreBoardGo.get());
@@ -124,7 +150,7 @@ void SetupPlayer(const PlayerInfo& playerInfo, const ControllerInfo& controllerI
 	PlayerScoreGo->AddComponent<dae::PlayerInfoComponent>(*PlayerScoreGo.get());
 	PlayerScoreGo->SetPosition(0.f, 40.f);*/
 
-	go = std::make_shared<dae::GameObject>();
+	auto go = std::make_shared<dae::GameObject>();
 	go->SetParent(playerInfo.hallways);
 	go->AddComponent<dae::RenderComponent>(*go.get());
 	/*go->AddComponent<dae::StateHandlerComponent>(*go.get());
@@ -160,7 +186,7 @@ void SetupPlayer(const PlayerInfo& playerInfo, const ControllerInfo& controllerI
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadShootTether"));
 			}
-			FiniteComp->AddState<dae::Running>("Running");
+			FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
 			FiniteComp->AddState<dae::DigDugAttack>("DigDugAttacking", controllerInfo.input.GetGamePad(playerInfo.name));
 
 			static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("KeyboardPump"));
@@ -234,7 +260,112 @@ void SetupPlayer(const PlayerInfo& playerInfo, const ControllerInfo& controllerI
 
 }
 
-void SetupEnemy(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2], std::vector<SDL_Rect> animLocations, dae::Scene& scene, dae::GameObject* hallways) {
+void SetupFygarPlayer(const FygarPlayerInfo& playerInfo, const ControllerInfo& controllerInfo, const ScoreInfo&) {
+	auto go = std::make_shared<dae::GameObject>();
+	go->SetParent(playerInfo.hallways);
+	go->AddComponent<dae::RenderComponent>(*go.get());
+
+	{
+
+		go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
+		auto FiniteComp = go->GetComponent<dae::FiniteStateMachineComponent>();
+		auto t = std::make_unique<dae::Gamepad>(controllerInfo.controllerIndex);
+		t->SetUsed(controllerInfo.usesGamePad);
+		controllerInfo.input.AddGamepad(playerInfo.name, std::move(t));
+		{
+			FiniteComp->AddState<dae::HandleInput>("HandleInput", controllerInfo.input.GetGamePad(playerInfo.name));
+
+			{
+				auto handleInputState = static_cast<dae::HandleInput*>(FiniteComp->GetState("HandleInput"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardUp"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("keyboardDown"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardLeft"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardRight"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardShootTether"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadUp"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadDown"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadLeft"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadFygarAttack"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardFygarAttack"));
+				//handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadShootTether"));
+			}
+			FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
+			FiniteComp->AddState<dae::FygarAttack>("FygarAttacking");
+			//FiniteComp->AddState<dae::DigDugAttack>("DigDugAttacking", controllerInfo.input.GetGamePad(playerInfo.name));
+
+			//static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("KeyboardPump"));
+			//static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("GamepadPump"));
+			FiniteComp->AddCondition<dae::HasMovementInput>("HasMovementInput");
+			FiniteComp->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
+			/*FiniteComp->AddCondition < dae::WantsToAttack>("WantsToAttack");
+			FiniteComp->AddCondition<dae::FinishedAttack>("FinishedAttack*/
+			FiniteComp->AddCondition<dae::FygarWantsToAttack>("FygarWantsToAttack");
+			FiniteComp->AddCondition<dae::FygarFinishedAttack>("FygarFinishedAttack");
+
+			FiniteComp->AddTransition(
+				FiniteComp->GetState("HandleInput"),
+				FiniteComp->GetState("Running"),
+				FiniteComp->GetCondition("HasMovementInput"));
+
+			FiniteComp->AddTransition(
+				FiniteComp->GetState("Running"),
+				FiniteComp->GetState("HandleInput"),
+				FiniteComp->GetCondition("IsDoneRunning"));
+
+			FiniteComp->AddTransition(
+				FiniteComp->GetState("HandleInput"),
+				FiniteComp->GetState("FygarAttacking"),
+				FiniteComp->GetCondition("FygarWantsToAttack"));
+
+			FiniteComp->AddTransition(
+				FiniteComp->GetState("FygarAttacking"),
+				FiniteComp->GetState("HandleInput"),
+				FiniteComp->GetCondition("FygarFinishedAttack"));
+
+			FiniteComp->SetCurrentState(
+				FiniteComp->GetState("HandleInput")
+			);
+		}
+	}
+	go->AddComponent<dae::MovementComponent>(*go.get());
+	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
+	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
+	go->GetComponent<dae::MovementComponent>()->SetIsDigger(false);
+
+	
+
+	go->GetComponent<dae::RenderComponent>()->SetTexture(playerInfo.texturePath, playerInfo.textureSrcRect);
+	go->AddComponent<dae::FygarAttackComponent>(*go.get(), playerInfo.fygarFlameRects, playerInfo.texturePath, 1.f);
+	go->SetPosition(static_cast<float>(playerInfo.startPos[0]), static_cast<float>(playerInfo.startPos[1]));
+
+	/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
+	gamepad->SetUsed(usesGamePad);
+	input.AddGamepad(std::move(gamepad));*/
+
+
+	go->AddComponent<dae::EnemyComponent>(*go.get(), 4, 100,3.f);
+	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8);
+	go->GetComponent<dae::HealthComponent>()->AddObserver(playerInfo.playerStatDisplay->GetComponent<dae::PlayerInfoComponent>()->GetHealthContainer());
+	/*auto playerComp = go->GetComponent<dae::PlayerComponent>();
+	auto healthComp = go->GetComponent<dae::HealthComponent>();
+	auto livesInfoComp = PlayerLivesGo->GetComponent<dae::PlayerInfoComponent>();
+	auto scoreInfoComp = PlayerScoreGo->GetComponent<dae::PlayerInfoComponent>();*/
+	/*if (playerComp && healthComp && livesInfoComp && scoreInfoComp) {
+		//PlayerLivesGo->AddComponent<dae::TextComponent>(*PlayerLivesGo, "# lives: " + std::to_string(healthComp->GetLives()), scoreInfo.font);
+		//PlayerScoreGo->AddComponent<dae::TextComponent>(*PlayerScoreGo, "Score: " + std::to_string(playerComp->GetScore()), scoreInfo.font);
+		playerComp->AddObserver(scoreInfoComp);
+		healthComp->AddObserver(livesInfoComp);
+	}*/
+	//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
+	//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
+	playerInfo.scene.Add(go);
+	controllerInfo.input.AddGameActor(go.get());
+	//playerInfo.scene.Add(PlayerLivesGo);
+	//playerInfo.scene.Add(PlayerScoreGo);
+}
+
+void SetupEnemy(EnemyInfo enemyInfo) {
 	auto go = std::make_shared<dae::GameObject>();
 
 	go = std::make_shared<dae::GameObject>();
@@ -242,9 +373,9 @@ void SetupEnemy(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2
 	//SetupFiniteStateMachine (maybe seperate method later)
 	{
 		go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToPlayer>("FloatingToPlayer", animLocations, 0.3f);
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToGrid>("FloatingToGrid", animLocations, 0.3f);
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Running>("Running");
+		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToPlayer>("FloatingToPlayer", enemyInfo.floatingAnimLocations, 0.3f);
+		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToGrid>("FloatingToGrid", enemyInfo.floatingAnimLocations, 0.3f);
+		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Running>("Running", enemyInfo.runningAnimLocations, 0.3f);
 		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Idle>("Idle");
 		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Tethered>("Tethered");
 
@@ -312,10 +443,15 @@ void SetupEnemy(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2
 	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
 	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
 	go->AddComponent<dae::FloatingComponent>(*go.get(), 30.f);
-	go->SetParent(hallways);
 
-	go->GetComponent<dae::RenderComponent>()->SetTexture(texturePath, textureSrcRect);
-	go->SetPosition(static_cast<float>(startPos[0]), static_cast<float>(startPos[1]));
+	if (!enemyInfo.fygarFlameRects.empty()) {
+		go->AddComponent<dae::FygarAttackComponent>(*go.get(), enemyInfo.fygarFlameRects, enemyInfo.texturePath, 1.f);
+	}
+	go->SetParent(enemyInfo.hallways);
+
+
+	go->GetComponent<dae::RenderComponent>()->SetTexture(enemyInfo.texturePath, enemyInfo.textureSrcRect);
+	go->SetPosition(static_cast<float>(enemyInfo.startPos[0]), static_cast<float>(enemyInfo.startPos[1]));
 
 
 	/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
@@ -328,7 +464,7 @@ void SetupEnemy(std::string texturePath, SDL_Rect textureSrcRect, int startPos[2
 	//auto healthComp = go->GetComponent<dae::HealthComponent>();
 	//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
 	//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
-	scene.Add(go);
+	enemyInfo.scene.Add(go);
 }
 
 void SetupHallwaySources(dae::GameObject* go) {
@@ -354,6 +490,10 @@ void SetupTunnels(dae::GameObject* go) {
 		comp->SetHallwayType(std::pair<int, int>(11, 10), dae::HallwaysComponent::VERTICALTHROUGH);
 		comp->SetHallwayType(std::pair<int, int>(12, 10), dae::HallwaysComponent::BOTTOMCLOSED);
 		comp->SetHallwayType(std::pair<int, int>(10, 11), dae::HallwaysComponent::RIGHTCLOSED);
+		comp->SetHallwayType(std::pair<int, int>(10, 18), dae::HallwaysComponent::LEFTTOPCORNER);
+		comp->SetHallwayType(std::pair<int, int>(11, 18), dae::HallwaysComponent::VERTICALTHROUGH);
+		comp->SetHallwayType(std::pair<int, int>(12, 18), dae::HallwaysComponent::BOTTOMCLOSED);
+		comp->SetHallwayType(std::pair<int, int>(10, 19), dae::HallwaysComponent::RIGHTCLOSED);
 	}
 }
 
@@ -396,7 +536,7 @@ dae::GameObject* SetupLevelAndReturnHallwaysObject(dae::Scene& scene, bool wantH
 
 void SetupSound() {
 	auto& soundsystem = dae::ServiceLocator::get_SoundSystem();
-	soundsystem.AddSongs({"DigDug_SoundEffects/All_Clear.mp3", "DigDug_SoundEffects/Mother_Nature.mp3"});
+	soundsystem.AddSongs({"DigDug_SoundEffects/All_Clear.mp3", "DigDug_SoundEffects/Mother_Nature.mp3", "DigDug_SoundEffects/Spurt.mp3" });
 	soundsystem.AddEffects({ "DigDug_SoundEffects/fireball.wav", "DigDug_SoundEffects/pump.wav" });
 }
 
@@ -488,21 +628,26 @@ void load()
 
 
 		auto hallways = SetupLevelAndReturnHallwaysObject(singleScene, true);
-		PlayerInfo playerInfo{ "DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), { 161,81 }, "Single Player 1", singleScene, hallways, playerStatsDisplayGo.get()};
+		PlayerInfo playerInfo{ "DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},{161,81}, 
+			"Single Player 1", singleScene, hallways, playerStatsDisplayGo.get() };
 		ControllerInfo controllerInfo{ true, 0,input };
 		ScoreInfo scoreInfo{ smallFont, ScoreBoardParentGo };
 		SetupPlayer(playerInfo, controllerInfo, scoreInfo);
 		SetupTunnels(hallways);
-		int pos3[2]{ 160,160 };
-		SetupEnemy("DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), pos3, { SDL_Rect(0, 145, 14, 15) , SDL_Rect(16, 145, 14, 15) }, singleScene, hallways);
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),{ 160,160 },
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene, hallways };
+		
+		SetupEnemy(enemyInfo);
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15), { 288,160 },
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene, hallways, 
+			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)}};
+		SetupEnemy(enemyInfo2);
 		//Gameobject for the fps
 		auto go = std::make_shared<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
 		go->AddComponent<dae::FPSComponent>(*go.get());
 		go->GetComponent<dae::FPSComponent>()->SetToWriteComponent(go->GetComponent<dae::TextComponent>());
 		singleScene.Add(go);
-		SetupSound();
-		dae::ServiceLocator::get_SoundSystem().PlayMusic(0, 2.f);
 	}
 	auto& coopScene = dae::SceneManager::GetInstance().CreateScene("Coop");
 	{
@@ -533,30 +678,87 @@ void load()
 
 		auto hallways = SetupLevelAndReturnHallwaysObject(coopScene, true);
 		//Player setup
-		PlayerInfo playerInfo1{"DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {81,81}, "Coop Player 1", coopScene, hallways, playerStatsDisplayGo.get()};
+		PlayerInfo playerInfo1{"DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},
+			{81,81}, "Coop Player 1", coopScene, hallways, playerStatsDisplayGo.get()};
 		ControllerInfo controllerInfo1{ false, 0,input };
 		ScoreInfo scoreInfo1{ smallFont, ScoreBoardParentGo };
 		SetupPlayer(playerInfo1, controllerInfo1, scoreInfo1);
 		//int pos[2]{ 81,81 };
 		//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
 		//int pos2[2]{ 161,81 };
-		PlayerInfo playerInfo2{ "DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), { 161,81 }, "Coop Player 2", coopScene, hallways, playerStatsDisplayGo.get() };
+		PlayerInfo playerInfo2{ "DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},
+			{ 161,81 }, "Coop Player 2", coopScene, hallways, playerStatsDisplayGo.get() };
 		ControllerInfo controllerInfo2{ true, 0,input };
 		ScoreInfo scoreInfo2{ smallFont, ScoreBoardParentGo };
 		SetupPlayer(playerInfo2, controllerInfo2, scoreInfo2);
 		SetupTunnels(hallways);
-		int pos3[2]{ 160,160 };
-		SetupEnemy("DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), pos3, { SDL_Rect(0, 145, 14, 15) , SDL_Rect(16, 145, 14, 15) }, coopScene, hallways);
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), { 160,160 }, 
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene, hallways };
+		SetupEnemy(enemyInfo);
 		//Gameobject for the fps
 		auto go = std::make_shared<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
 		go->AddComponent<dae::FPSComponent>(*go.get());
 		go->GetComponent<dae::FPSComponent>()->SetToWriteComponent(go->GetComponent<dae::TextComponent>());
 		coopScene.Add(go);
-		SetupSound();
+		
 	}
-	//auto& pvpScene = dae::SceneManager::GetInstance().CreateScene("PvP");
+	auto& pvpScene = dae::SceneManager::GetInstance().CreateScene("PvP");
+	{
+		//Parent of player info
+		std::shared_ptr<dae::GameObject> playerStatsDisplayGo;
+		auto ScoreBoardParentGo = std::make_shared<dae::GameObject>();
+		{
+			ScoreBoardParentGo->SetPosition(0.f, 10.f);
+			pvpScene.Add(ScoreBoardParentGo);
+			auto controllsInfoGo = std::make_shared<dae::GameObject>();
+			controllsInfoGo->SetParent(ScoreBoardParentGo.get());
+			controllsInfoGo->AddComponent<dae::TextComponent>(*controllsInfoGo.get(), "Use the D-Pad to move DigDug, Y to inflict damage, X and B to pick up points", smallFont);
+			pvpScene.Add(controllsInfoGo);
+			controllsInfoGo = std::make_shared<dae::GameObject>();
+			controllsInfoGo->SetParent(ScoreBoardParentGo.get());
+			controllsInfoGo->AddComponent<dae::TextComponent>(*controllsInfoGo.get(), "Use WASD to move DigDug, C to inflict damage, Z and X to pick up points", smallFont);
+			controllsInfoGo->SetPosition(0.f, 0.f);
+			pvpScene.Add(controllsInfoGo);
 
+			playerStatsDisplayGo = std::make_shared<dae::GameObject>();
+			playerStatsDisplayGo->SetParent(ScoreBoardParentGo.get());
+			playerStatsDisplayGo->SetPosition(0.f, 20.f);
+			playerStatsDisplayGo->AddComponent<dae::PlayerInfoComponent>(*playerStatsDisplayGo.get());
+			playerStatsDisplayGo->AddComponent<dae::TextComponent>(*playerStatsDisplayGo.get(), "", smallFont);
+			pvpScene.Add(playerStatsDisplayGo);
+		}
+
+
+		auto hallways = SetupLevelAndReturnHallwaysObject(pvpScene, true);
+		//Player setup
+		PlayerInfo playerInfo1{ "DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},
+			{81,81}, "PvP Player 1", pvpScene, hallways, playerStatsDisplayGo.get() };
+		ControllerInfo controllerInfo1{ false, 0,input };
+		ScoreInfo scoreInfo1{ smallFont, ScoreBoardParentGo };
+		SetupPlayer(playerInfo1, controllerInfo1, scoreInfo1);
+		//int pos[2]{ 81,81 };
+		//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
+		//int pos2[2]{ 161,81 };
+		FygarPlayerInfo fygarPlayerInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15), { SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },
+			{ 161,81 }, "PvP Player 2", pvpScene, hallways, playerStatsDisplayGo.get(), {SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
+
+		ControllerInfo controllerInfo2{ true, 0,input };
+		ScoreInfo scoreInfo2{ smallFont, ScoreBoardParentGo };
+		SetupFygarPlayer(fygarPlayerInfo, controllerInfo2, scoreInfo2);
+		SetupTunnels(hallways);
+		/*EnemyInfo enemyInfo{"DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), {160,160},
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, pvpScene, hallways };
+		SetupEnemy(enemyInfo);*/
+		//Gameobject for the fps
+		auto go = std::make_shared<dae::GameObject>();
+		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
+		go->AddComponent<dae::FPSComponent>(*go.get());
+		go->GetComponent<dae::FPSComponent>()->SetToWriteComponent(go->GetComponent<dae::TextComponent>());
+		pvpScene.Add(go);
+
+	}
+	SetupSound();
 	dae::ServiceLocator::get_SoundSystem().PlayMusic(0, 2.f);
 	dae::SceneManager::GetInstance().SetActiveScene(*sceneManager.GetScene("MainMenu"));
 }

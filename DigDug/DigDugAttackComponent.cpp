@@ -90,12 +90,12 @@ void dae::DigDugAttackComponent::Update()
 	if (!m_Connected) {
 		auto enemies = dae::SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::EnemyComponent>();
 		auto result = std::find_if(enemies.begin(), enemies.end(), [&](GameObject* gameObject) {
-			auto render = gameObject->GetComponent<dae::RenderComponent>();
+			auto render = GetOwner()->GetComponent<dae::RenderComponent>();
 			if (render) {
 				auto enPos = gameObject->GetWorldTransform().GetPosition();
 				auto plPos = GetOwner()->GetWorldTransform().GetPosition();
 				auto rect = SDL_Rect{ static_cast<int>(enPos.x), static_cast<int>(enPos.y), render->GetBox().w, render->GetBox().h };
-				auto plRect = GetWorldSpikeRect(*render);
+				auto plRect = GetWorldSpikeRectCollision(*render);
 				return SDL_HasIntersection(&rect, &plRect);
 			}
 			return SDL_FALSE;
@@ -157,6 +157,34 @@ void dae::DigDugAttackComponent::Render()
 			}
 		}
 	}
+}
+
+SDL_Rect dae::DigDugAttackComponent::GetWorldSpikeRectCollision(RenderComponent& render)
+{
+	const auto& pos = BaseComponent::GetOwner()->GetWorldTransform().GetPosition();
+	switch (render.GetDirection()) {
+	case RenderComponent::RIGHT:
+		return SDL_Rect(static_cast<int>(pos.x) + m_SpriteXYOffset.first,
+			static_cast<int>(pos.y) + m_SpriteXYOffset.second / 2 - m_CurrentAttackRect.h / 2,
+			m_CurrentAttackRect.w, m_CurrentAttackRect.h);
+		break;
+	case RenderComponent::LEFT:
+		return SDL_Rect(static_cast<int>(pos.x) - m_CurrentAttackRect.w,
+			static_cast<int>(pos.y) + m_SpriteXYOffset.second / 2 - m_CurrentAttackRect.h / 2,
+			m_CurrentAttackRect.w, m_CurrentAttackRect.h);
+		break;
+	case RenderComponent::UP:
+		return SDL_Rect(static_cast<int>(pos.x),
+			static_cast<int>(pos.y) - m_CurrentAttackRect.w,
+			m_CurrentAttackRect.h, m_CurrentAttackRect.w);
+		break;
+	case RenderComponent::DOWN:
+		return SDL_Rect(static_cast<int>(pos.x) + m_SpriteXYOffset.second / 2 - m_CurrentAttackRect.h / 2,
+			static_cast<int>(pos.y) + m_SpriteXYOffset.first,
+			m_CurrentAttackRect.h, m_CurrentAttackRect.w);
+		break;
+	}
+	return {};
 }
 
 SDL_Rect dae::DigDugAttackComponent::GetWorldSpikeRect(RenderComponent& render)
