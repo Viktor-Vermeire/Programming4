@@ -177,7 +177,6 @@
     <ClCompile Include="Pump.cpp" />
     <ClCompile Include="RockComponent.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
-    <ClCompile Include="SaveScoreCommand.cpp" />
     <ClCompile Include="ScoreObserver.cpp" />
     <ClCompile Include="SelectModeCommand.cpp" />
     <ClCompile Include="States.cpp" />
@@ -210,7 +209,6 @@
     <ClInclude Include="Pump.h" />
     <ClInclude Include="RockComponent.h" />
     <ClInclude Include="RotatorComponent.h" />
-    <ClInclude Include="SaveScoreCommand.h" />
     <ClInclude Include="ScoreObserver.h" />
     <ClInclude Include="SelectModeCommand.h" />
     <ClInclude Include="States.h" />

@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "HealthComponent.h"
 
-dae::Suicide::Suicide(int inputValue, bool usingGamepad) : Command(inputValue, usingGamepad)
+dae::Suicide::Suicide(unsigned int inputValue, bool usingGamepad) : Command(inputValue, usingGamepad)
 {
 }
 

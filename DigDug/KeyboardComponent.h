@@ -18,9 +18,16 @@ namespace dae {
 		void ChangeHighlightedLetter(std::pair<float, float> change);
 		void SetHighLightSize(std::pair<int, int> size);
 		void ConfirmLetter();
+		void SaveScore();
+		void SetFileName(std::string fileName);
 		void Render() override;
 		KeyInfo GetKeyLocation(int x, int y);
 	private:
+		bool m_HasRead{ false };
+		void ReadHighScoreBinary();
+		std::unique_ptr<const char[]> IntToBytes(int value);
+		std::vector < std::pair<std::string, int>> m_SavedScores;
+		std::string m_FileName;
 		float m_InputCooldown;
 		float m_CooldownTimer;
 		std::string m_SavedString{""};

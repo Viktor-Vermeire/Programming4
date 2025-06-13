@@ -1,6 +1,6 @@
 #include "Command.h"
 
-dae::Command::Command(int inputValue, bool usingGamepad): m_InputValue{inputValue}, m_UsingGamepad{usingGamepad}
+dae::Command::Command(unsigned int inputValue, bool usingGamepad): m_InputValue{inputValue}, m_UsingGamepad{usingGamepad}
 {
 }
 

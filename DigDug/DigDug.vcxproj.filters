@@ -132,9 +132,6 @@
     <ClCompile Include="KeyboardCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SaveScoreCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Move.h">
@@ -206,9 +203,6 @@
     <ClInclude Include="FygarAttackComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="FygarAttackCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="GameMasterComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -225,9 +219,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="KeyboardCommand.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Commands</Filter>
     </ClInclude>
-    <ClInclude Include="SaveScoreCommand.h">
+    <ClInclude Include="FygarAttackCommand.h">
       <Filter>Header Files\Commands</Filter>
     </ClInclude>
   </ItemGroup>

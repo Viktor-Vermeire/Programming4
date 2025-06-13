@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "PlayerComponent.h"
 
-dae::Pickup::Pickup(int inputValue, bool usingGamepad, int scoreValue) : Command(inputValue, usingGamepad), m_ScoreValue{scoreValue}
+dae::Pickup::Pickup(unsigned int inputValue, bool usingGamepad, int scoreValue) : Command(inputValue, usingGamepad), m_ScoreValue{scoreValue}
 {
 }
 

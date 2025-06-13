@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "DigDugAttackComponent.h"
 
-dae::Pump::Pump(int inputValue, bool usingGamepad): Command(inputValue, usingGamepad)
+dae::Pump::Pump(unsigned int inputValue, bool usingGamepad): Command(inputValue, usingGamepad)
 {
 }
 

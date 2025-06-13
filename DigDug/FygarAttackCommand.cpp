@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "ServiceLocator.h"
 
-dae::FygarAttackCommand::FygarAttackCommand(int inputValue, bool usingGamepad) :Command(inputValue, usingGamepad)
+dae::FygarAttackCommand::FygarAttackCommand(unsigned int inputValue, bool usingGamepad) :Command(inputValue, usingGamepad)
 {
 }
 

@@ -51,7 +51,7 @@ void dae::FygarAttackComponent::Update()
 		m_CurrentFlameRect = m_FlameRects[index];
 	}
 
-	auto players = dae::SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::PlayerComponent>();
+	auto players = dae::SceneManager::GetInstance().GetActiveScene()->findActiveGameObjectsWithComponent<dae::PlayerComponent>();
 	auto result = std::find_if(players.begin(), players.end(), [&](GameObject* gameObject) {
 		auto render = GetOwner()->GetComponent<dae::RenderComponent>();
 		auto enemyRender = gameObject->GetComponent<dae::RenderComponent>();

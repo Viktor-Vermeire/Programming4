@@ -5,7 +5,7 @@ namespace dae {
         public Command
     {
     public:
-        Pickup(int inputValue, bool usingGamepad, int scoreValue);
+        Pickup(unsigned int inputValue, bool usingGamepad, int scoreValue);
         void execute(GameObject& gameObject) override;
     private:
         int m_ScoreValue;

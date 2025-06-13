@@ -42,6 +42,20 @@ namespace dae
 			return result;
 		}
 
+		template <typename ComponentType>
+		std::vector<GameObject*> findActiveGameObjectsWithComponent() {
+			std::vector<GameObject*> result;
+
+			auto it = m_Objects.begin();
+			while ((it = std::find_if(it, m_Objects.end(), [](GameObject* gameObject) {
+				return gameObject->IsComponentPresent<ComponentType>() && gameObject->m_Active;
+				})) != m_Objects.end()) {
+				result.push_back(*it);
+				++it;
+			}
+			return result;
+		}
+
 		~Scene();
 		Scene(const Scene& other) = delete;
 		Scene(Scene&& other) = delete;

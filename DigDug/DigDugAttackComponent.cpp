@@ -88,7 +88,7 @@ void dae::DigDugAttackComponent::Update()
 		m_CurrentAttackRect.x = (m_MaxAttackRect.x + m_MaxAttackRect.w - m_CurrentAttackRect.w);
 	}
 	if (!m_Connected) {
-		auto enemies = dae::SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::EnemyComponent>();
+		auto enemies = dae::SceneManager::GetInstance().GetActiveScene()->findActiveGameObjectsWithComponent<dae::EnemyComponent>();
 		auto result = std::find_if(enemies.begin(), enemies.end(), [&](GameObject* gameObject) {
 			auto render = GetOwner()->GetComponent<dae::RenderComponent>();
 			auto enemyRender = gameObject->GetComponent<dae::RenderComponent>();

@@ -5,7 +5,7 @@ namespace dae {
     class DigDugAttackCommand : public Command
     {
     public:
-        DigDugAttackCommand(int inputValue, bool usingGamepad);
+        DigDugAttackCommand(unsigned int inputValue, bool usingGamepad);
         void execute(GameObject& gameObject);
     };
 };

@@ -5,7 +5,7 @@ namespace dae {
         public Command
     {
     public:
-        Pump(int inputValue, bool usingGamepad);
+        Pump(unsigned int inputValue, bool usingGamepad);
         void execute(GameObject& gameObject) override;
     private:
     };

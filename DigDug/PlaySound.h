@@ -5,7 +5,7 @@ namespace dae {
         public Command
     {
     public:
-        PlaySound(int inputValue, bool usingGamepad, int soundId);
+        PlaySound(unsigned int inputValue, bool usingGamepad, int soundId);
         void execute(GameObject& gameObject);
     private:
         int m_SoundId;

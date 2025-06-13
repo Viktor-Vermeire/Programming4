@@ -5,7 +5,7 @@ namespace dae {
         public Command
     {
     public:
-        Suicide(int inputValue, bool usingGamepad);
+        Suicide(unsigned int inputValue, bool usingGamepad);
         void execute(GameObject& gameObject) override;
     private:
     };

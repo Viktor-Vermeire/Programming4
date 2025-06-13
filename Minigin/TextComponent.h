@@ -19,6 +19,7 @@ namespace dae
 		TextComponent(TextComponent&& other) = default;
 		TextComponent& operator=(const TextComponent& other) = delete;
 		TextComponent& operator=(TextComponent&& other) = default;
+		std::shared_ptr<Font> GetFont();
 	private:
 		bool m_NeedsUpdate;
 		std::string m_Text;

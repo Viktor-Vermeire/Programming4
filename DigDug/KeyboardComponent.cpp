@@ -7,6 +7,11 @@
 #include "SceneManager.h"
 #include "Scene.h"
 #include "PlayerComponent.h"
+#include "Scene.h"
+#include <fstream>
+#include "algorithm"
+#include "filesystem"
+#include <array>
 
 dae::KeyboardComponent::KeyboardComponent(GameObject& gameObject, float inputCoolDown): BaseComponent(gameObject), m_InputCooldown{inputCoolDown}
 {
@@ -17,6 +22,22 @@ dae::KeyboardComponent::KeyboardComponent(GameObject& gameObject, float inputCoo
 
 void dae::KeyboardComponent::Update()
 {
+	if (!m_HasRead) {
+		ReadHighScoreBinary();
+		m_HasRead = true;
+		auto results = SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<PlayerComponent>();
+		auto textResults = SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<TextComponent>();
+		if (!results[0] && textResults[0]) return;
+		int looper{ 0 };
+		for (auto player : results) {
+			auto gameObject = std::make_unique<GameObject>();
+			gameObject->SetPosition(300.f , 180.f + (looper * 36.f));
+			gameObject->AddComponent<dae::TextComponent>(*gameObject.get(), "Player " + std::to_string(looper+1) + ": " +
+				std::to_string(player->GetComponent<PlayerComponent>()->GetScore()), textResults[0]->GetComponent<TextComponent>()->GetFont());
+			SceneManager::GetInstance().GetActiveScene()->Add(std::move(gameObject));
+			++looper;
+		}
+	}
 	if (m_CooldownTimer >= 0) {
 		m_CooldownTimer -= Minigin::DELTATIME;
 	}
@@ -67,6 +88,11 @@ void dae::KeyboardComponent::ConfirmLetter()
 	}
 }
 
+void dae::KeyboardComponent::SetFileName(std::string fileName)
+{
+	m_FileName = fileName;
+}
+
 void dae::KeyboardComponent::Render()
 {
 	Renderer::GetInstance().RenderRect(SDL_Rect{
@@ -79,3 +105,96 @@ dae::KeyInfo dae::KeyboardComponent::GetKeyLocation(int x, int y)
 {
 	return m_KeyLocations[y][x];
 }
+
+std::unique_ptr<const char[]> dae::KeyboardComponent::IntToBytes(int value)
+{
+	auto bytes = std::make_unique<char[]>(sizeof(int));
+	for (size_t i = 0; i < sizeof(int); ++i) {
+		bytes[i] = static_cast<char>((value >> (i * 8)) & 0xFF);
+	}
+	return bytes;
+}
+
+void dae::KeyboardComponent::SaveScore()
+{
+	if (m_CooldownTimer > 0) return;
+	m_CooldownTimer = m_InputCooldown;
+	auto results = SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<PlayerComponent>();
+	if (!results[0]) return;
+
+	std::ifstream inFile(m_FileName, std::ios::binary);
+	if (inFile) {
+		inFile.close();
+		std::filesystem::remove(m_FileName);
+	}
+
+	std::ofstream outFile(m_FileName, std::ios::binary | std::ios::app);
+	//if (!outFile) ;
+	m_SavedScores.emplace_back(m_SavedString, results[0]->GetComponent<PlayerComponent>()->GetScore());
+	std::sort(m_SavedScores.begin(), m_SavedScores.end(), [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
+		return a.second < b.second;
+		});
+
+	
+	int looper{ 0 };
+	while (looper < 10 && looper < m_SavedScores.size()) {
+		char tag = 'P';
+		outFile.write(&tag, sizeof(tag));
+
+		outFile.write(m_SavedScores[looper].first.c_str(), m_SavedScores[looper].first.size());
+		char terminator = '\0';
+		outFile.write(&terminator, sizeof(char));
+		auto test = IntToBytes(m_SavedScores[looper].second);
+		outFile.write(test.get(), sizeof(int));
+		++looper;
+	}
+	
+
+	outFile.close();
+}
+
+void dae::KeyboardComponent::ReadHighScoreBinary()
+{
+	std::ifstream inFile(m_FileName, std::ios::binary);
+	if (!inFile) return;
+
+	std::cout << "\nSaved Players (Binary)\n";
+
+	while (inFile)
+	{
+		char tag{};
+		inFile.read(&tag, sizeof(tag));
+		if (!inFile || tag != 'P') break;
+
+		std::string name{};
+		char c{};
+		while (inFile.read(&c, sizeof(char)) && c != '\0') {
+			name += c;
+		}
+
+		int score{};
+		if (!inFile.read(reinterpret_cast<char*>(&score), sizeof(int))) break;
+
+		m_SavedScores.emplace_back(std::pair{ name, score });
+
+		std::cout << "Name: " << name << ", Score: " << score << '\n';
+	}
+
+	inFile.close();
+	auto results = SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<TextComponent>();
+	if (!results[0]) return;
+	auto font = results[0]->GetComponent<TextComponent>()->GetFont();
+	std::vector<GameObject*> objects{};
+	for (int looper{ 0 }; looper < m_SavedScores.size()  && looper < 7; ++looper) {
+		auto gameObject = std::make_unique<GameObject>();
+		gameObject->SetPosition(30.f, looper * 36.f);
+		gameObject->AddComponent<dae::TextComponent>(*gameObject.get(), (looper + 1) + ") " + 
+			m_SavedScores[looper].first + " : " + std::to_string(m_SavedScores[looper].second), font);
+		objects.emplace_back( gameObject.get() );
+		SceneManager::GetInstance().GetActiveScene()->Add(std::move(gameObject));
+	}
+
+
+}
+
+

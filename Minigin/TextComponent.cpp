@@ -55,3 +55,8 @@ void dae::TextComponent::SetOffset(std::pair<float, float>& offset)
 {
 	m_Offset = offset;
 }
+
+std::shared_ptr<dae::Font> dae::TextComponent::GetFont()
+{
+	return m_pFont;
+}

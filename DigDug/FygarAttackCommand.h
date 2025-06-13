@@ -4,7 +4,7 @@ namespace dae {
     class FygarAttackCommand : public Command
     {
     public:
-        FygarAttackCommand(int inputValue, bool usingGamepad);
+        FygarAttackCommand(unsigned int inputValue, bool usingGamepad);
         void execute(GameObject& gameObject);
     };
 }

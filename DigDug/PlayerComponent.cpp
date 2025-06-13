@@ -19,7 +19,7 @@ std::string dae::PlayerComponent::GetName()
 
 void dae::PlayerComponent::Update()
 {
-	auto enemies = dae::SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::EnemyComponent>();
+	auto enemies = dae::SceneManager::GetInstance().GetActiveScene()->findActiveGameObjectsWithComponent<dae::EnemyComponent>();
 	auto result = std::find_if(enemies.begin(), enemies.end(), [&](GameObject* gameObject) {
 		auto render = GetOwner()->GetComponent<dae::RenderComponent>();
 		auto enemyRender = gameObject->GetComponent<dae::RenderComponent>();

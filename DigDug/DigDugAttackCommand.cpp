@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "ServiceLocator.h"
 
-dae::DigDugAttackCommand::DigDugAttackCommand(int inputValue, bool usingGamepad) :Command(inputValue, usingGamepad)
+dae::DigDugAttackCommand::DigDugAttackCommand(unsigned int inputValue, bool usingGamepad) :Command(inputValue, usingGamepad)
 {
 
 }

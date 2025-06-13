@@ -52,7 +52,7 @@ bool dae::EnemyComponent::IncreaseInflation()
 {
 	++m_Inflation;
 	if (m_Inflation >= m_MaxInflation) {
-		GetOwner()->SetToBeDeleted(true);
+		GetOwner()->m_Active = false;
 		return true;
 	}
 	return false;

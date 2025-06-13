@@ -6,7 +6,7 @@
 #include "MovementComponent.h"
 
 namespace dae {
-	Move::Move(int inputValue,bool usingGamepad, RenderComponent::Direction direction): Command(inputValue, usingGamepad), m_Direction{direction}
+	Move::Move(unsigned int inputValue,bool usingGamepad, RenderComponent::Direction direction): Command(inputValue, usingGamepad), m_Direction{direction}
 	{
 	}
 	void Move::execute(GameObject& gameObject)
