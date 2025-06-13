@@ -126,6 +126,12 @@
     <ClCompile Include="PlayerPresenceObserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KeyboardComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Move.h">
@@ -210,6 +216,12 @@
       <Filter>Header Files\Observers</Filter>
     </ClInclude>
     <ClInclude Include="PlayerPresenceObserver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyboardCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

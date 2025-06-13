@@ -82,26 +82,35 @@ void dae::MovementComponent::Move(dae::RenderComponent::Direction direction)
 		return;*/
 	if (!GetOwner()->GetParent()) return;
 	//std::cout << "Being hit \n";
-	m_WantsToMove = true;
+	//m_WantsToMove = true;
 	
 	HallwaysComponent* hallways = ((GetOwner()->GetParent() != nullptr) ? GetOwner()->GetParent()->GetComponent<HallwaysComponent>() : nullptr);
 	if (hallways == nullptr)
 		return;
+	auto pos = GetOwner()->GetWorldTransform().GetPosition();
 	//hallways->Dig(GetOwner()->GetWorldTransform().GetPosition(), GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{m_DistancePerMove / m_TimePerMove, 0, 0});
 	switch (direction) {
 	case RenderComponent::RIGHT:
+		pos.x = pos.x + m_DistancePerMove;
+		m_WantsToMove = hallways->IsValidHallway(pos);
 		m_CurrentMovement = { m_DistancePerMove / m_TimePerMove, 0 };
 		break;
 	case RenderComponent::DOWN:
+		pos.y = pos.y + m_DistancePerMove;
+		m_WantsToMove = hallways->IsValidHallway(pos);
 		m_CurrentMovement = { 0 , m_DistancePerMove / m_TimePerMove };
 		break;
 	case RenderComponent::UP:
+		pos.y = pos.y - m_DistancePerMove;
+		m_WantsToMove = hallways->IsValidHallway(pos);
 		m_CurrentMovement = { 0 , -m_DistancePerMove / m_TimePerMove };
 		break;
 	case RenderComponent::LEFT:
+		pos.x = pos.x - m_DistancePerMove;
+		m_WantsToMove = hallways->IsValidHallway(pos);
 		m_CurrentMovement = { -m_DistancePerMove / m_TimePerMove, 0 };
 		break;
 	}
-	if (m_IsDigger) 
+	if (m_IsDigger && m_WantsToMove) 
 		hallways->Dig(GetOwner()->GetWorldTransform().GetPosition(), GetOwner()->GetWorldTransform().GetPosition() + glm::vec3{ m_CurrentMovement * m_TimePerMove, 0 });
 }

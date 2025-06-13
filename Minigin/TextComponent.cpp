@@ -17,7 +17,7 @@ dae::TextComponent::TextComponent(GameObject& gameObject, const std::string& tex
 
 void dae::TextComponent::Update()
 {
-	if (m_NeedsUpdate) {
+	if (m_NeedsUpdate && m_Text != "") {
 
 		const SDL_Color color = { 255,255,255,255 }; // only white text is supported now
 		const auto surf = TTF_RenderText_Blended(m_pFont->GetFont(), m_Text.c_str(), color);
@@ -47,6 +47,11 @@ void dae::TextComponent::Render()
 	if (m_pTextTexture != nullptr)
 	{
 		const auto& pos = BaseComponent::GetOwner()->GetWorldTransform().GetPosition();
-		Renderer::GetInstance().RenderTexture(*m_pTextTexture, pos.x, pos.y);
+		Renderer::GetInstance().RenderTexture(*m_pTextTexture, pos.x + m_Offset.first, pos.y + m_Offset.second);
 	}
+}
+
+void dae::TextComponent::SetOffset(std::pair<float, float>& offset)
+{
+	m_Offset = offset;
 }

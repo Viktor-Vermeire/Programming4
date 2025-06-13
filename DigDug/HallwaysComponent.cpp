@@ -25,8 +25,14 @@ void dae::HallwaysComponent::ClearSky()
 {
 	for (int looper{ 0 };looper < m_Hallways.size() / 5; ++looper) {
 		for (int innerLooper{ 0 }; innerLooper < m_Hallways.at(looper).size(); ++innerLooper) {
-			m_Hallways.at(looper).at(innerLooper) = SKY;
+			if (looper == (m_Hallways.size() / 5) - 1) {
+				m_Hallways.at(looper).at(innerLooper) = CLEARED;
+			}
+			else {
+				m_Hallways.at(looper).at(innerLooper) = SKY;
+			}
 		}
+		
 	}
 }
 
@@ -64,6 +70,18 @@ void dae::HallwaysComponent::AddSource(HallwayType type, SDL_Rect source)
 const dae::HallwaysComponent::HallwayType& dae::HallwaysComponent::GetHallwayType(const glm::vec3 location)
 {
 	return m_Hallways.at(static_cast<int>(std::round(location.y / 16))).at(static_cast<int>(std::round(location.x / 16)));
+}
+
+bool dae::HallwaysComponent::IsValidHallway(const glm::vec3 location)
+{
+	int x = static_cast<int>(std::round(location.y / 16));
+	int y = static_cast<int>(std::round(location.x / 16));
+	if (x < 0 || x >= m_Hallways.size()) {
+		return false;
+	}
+	if (y < 0 || y >= m_Hallways[x].size())
+		return false;
+	return m_Hallways[x][y] != SKY;
 }
 
 glm::vec3 dae::HallwaysComponent::GetFreeHallwayLocation(const glm::vec3 location)
@@ -108,9 +126,13 @@ void dae::HallwaysComponent::Render()
 	for (int outerLooper{ 0 }; outerLooper < m_Hallways.size(); ++outerLooper) {
 		for (int innerLooper{ 0 }; innerLooper < m_Hallways.at(outerLooper).size(); ++innerLooper) {
 			if (m_Hallways.at(outerLooper).at(innerLooper) != SKY)
-				Renderer::GetInstance().RenderTexture(*m_Texture, m_Sources.at(m_Hallways.at(outerLooper).at(innerLooper)), SDL_Rect(innerLooper * 16, outerLooper * 16, m_Sources.at(m_Hallways.at(outerLooper).at(innerLooper)).w, m_Sources.at(m_Hallways.at(outerLooper).at(innerLooper)).h));
+				Renderer::GetInstance().RenderTexture(*m_Texture, m_Sources.at(m_Hallways.at(outerLooper).at(innerLooper)), 
+					SDL_Rect(innerLooper * 16, outerLooper * 16, m_Sources.at(m_Hallways.at(outerLooper).at(innerLooper)).w, 
+						m_Sources.at(m_Hallways.at(outerLooper).at(innerLooper)).h));
 		}
 	}
+	opacity = 255;
+	SDL_SetTextureAlphaMod(m_Texture->GetSDLTexture(), opacity);
 }
 
 void dae::HallwaysComponent::DigRight(const glm::vec3 fromLocation, const glm::vec3 toLocation)

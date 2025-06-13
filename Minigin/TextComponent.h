@@ -13,6 +13,7 @@ namespace dae
 		void Update() override;
 		void SetText(const std::string& text);
 		void Render() override;
+		void SetOffset(std::pair<float, float>& offset);
 		virtual ~TextComponent() = default;
 		TextComponent(const TextComponent& other) = delete;
 		TextComponent(TextComponent&& other) = default;
@@ -21,6 +22,7 @@ namespace dae
 	private:
 		bool m_NeedsUpdate;
 		std::string m_Text;
+		std::pair<float, float> m_Offset;
 		std::shared_ptr<Font> m_pFont;
 		std::shared_ptr<Texture2D> m_pTextTexture;
 		

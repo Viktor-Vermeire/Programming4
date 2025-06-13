@@ -44,6 +44,8 @@
 #include "FygarAttackComponent.h"
 #include "FygarAttackCommand.h"
 #include "GameMasterComponent.h"
+#include "KeyboardComponent.h"
+#include "KeyboardCommand.h"
 
 namespace fs = std::filesystem;
 
@@ -78,6 +80,12 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::SelectModeCommand>("SelectModeCoop", 8192, true, "Coop", 2);
 	input.AddCommand<dae::SelectModeCommand>("SelectModePvP", 16384, true, "PvP", 1);
 
+	input.AddCommand<dae::KeyboardMoveCommand>("GamepadKeyboardUp", 1, true, std::pair{ 0.f,-1.f });
+	input.AddCommand<dae::KeyboardMoveCommand>("GamepadKeyboardDown", 2, true, std::pair{ 0.f,1.f });
+	input.AddCommand<dae::KeyboardMoveCommand>("GamepadKeyboardLeft", 4, true, std::pair{ -1.f,0.f });
+	input.AddCommand<dae::KeyboardMoveCommand>("GamepadKeyboardRight", 8, true, std::pair{ 1.f,0.f });
+	input.AddCommand<dae::KeyboardConfirmCommand>("GamepadKeyboardConfirm", 4096, true);
+
 	/*input.AddCommand<dae::Move>(1, true, dae::RenderComponent::UP);
 	input.AddCommand<dae::Move>(2, true, dae::RenderComponent::DOWN);
 	input.AddCommand<dae::Move>(4, true, dae::RenderComponent::LEFT);
@@ -108,6 +116,13 @@ struct PlayerInfo {
 	dae::GameObject* hallways;
 	dae::GameObject* playerStatDisplay;
 	dae::GameObject* gameMaster;
+};
+struct PlayerInfoTemp {
+	std::string texturePath;
+	SDL_Rect textureSrcRect;
+	std::vector<SDL_Rect> runningAnimLocations;
+	int startPos[2];
+	std::string name;
 };
 struct FygarPlayerInfo {
 	std::string texturePath;
@@ -478,6 +493,7 @@ void SetupHallwaySources(dae::GameObject* go) {
 	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::RIGHTBOTTOMCORNER, SDL_Rect(163, 99, 16, 16));
 	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::CLEARED, SDL_Rect(163, 117, 16, 16));
 	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::FILLED, SDL_Rect(181, 99, 16, 16));
+	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::SKY, SDL_Rect(181, 99, 0, 0));
 }
 
 void SetupTunnels(dae::GameObject* go) {
@@ -491,6 +507,55 @@ void SetupTunnels(dae::GameObject* go) {
 		comp->SetHallwayType(std::pair<int, int>(11, 18), dae::HallwaysComponent::VERTICALTHROUGH);
 		comp->SetHallwayType(std::pair<int, int>(12, 18), dae::HallwaysComponent::BOTTOMCLOSED);
 		comp->SetHallwayType(std::pair<int, int>(10, 19), dae::HallwaysComponent::RIGHTCLOSED);
+	}
+}
+
+void SetupKeyboard(dae::Scene& scene, std::shared_ptr<dae::Font> font, int lettersPerLine, dae::InputManager& input) {
+	int width = 0;
+	int height = 0;
+	SDL_GetWindowSize(dae::Renderer::GetInstance().GetSDLWindow(), &width, &height);
+	auto keyboardParent = std::make_shared<dae::GameObject>();
+	keyboardParent->AddComponent<dae::KeyboardComponent>(*keyboardParent.get(), 0.5f);
+	auto keyboardComp = keyboardParent->GetComponent<dae::KeyboardComponent>();
+	keyboardComp->SetHighLightSize({ 36,36 });
+	keyboardParent->AddComponent<dae::TextComponent>(*keyboardParent.get(), "", font);
+	auto offset = std::pair<float, float>(20.f, -30.f);
+	keyboardParent->GetComponent<dae::TextComponent>()->SetOffset(offset);
+	keyboardParent->AddComponent<dae::FiniteStateMachineComponent>(*keyboardParent.get());
+	auto finiteComp = keyboardParent->GetComponent<dae::FiniteStateMachineComponent>();
+	finiteComp->AddState<dae::HandleInput>("HandleInput", input.GetGamePad("GamepadPlayer1"));
+	auto handleInput = static_cast<dae::HandleInput*>(finiteComp->GetState("HandleInput"));
+	handleInput->AddCommand(input.GetCommand("GamepadKeyboardUp"));
+	handleInput->AddCommand(input.GetCommand("GamepadKeyboardDown"));
+	handleInput->AddCommand(input.GetCommand("GamepadKeyboardLeft"));
+	handleInput->AddCommand(input.GetCommand("GamepadKeyboardRight"));
+	handleInput->AddCommand(input.GetCommand("GamepadKeyboardConfirm"));
+	finiteComp->SetCurrentState(handleInput);
+
+	scene.Add(keyboardParent);
+	std::vector<std::string> letters = { "A", "B","C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+	"O", "P","Q", "R", "S", "V", "U", "W", "T", "X", "Y", "Z" };
+	auto numberOflines = ((letters.size() - std::fmodf(static_cast<float>(letters.size()), static_cast<float>(lettersPerLine))) / lettersPerLine) + 1;
+	keyboardParent->SetPosition((width - (36.f * lettersPerLine)) / 2.f, height - (numberOflines * 36.f));
+	int letterCount{ 0 };
+	int RowCount{ 0 };
+	while (letterCount < letters.size()){
+		for (int collumnLooper{ 0 }; collumnLooper < lettersPerLine; ++collumnLooper) {
+			auto letterObject = std::make_shared<dae::GameObject>();
+			letterObject->SetParent(keyboardParent.get());
+			letterObject->AddComponent<dae::TextComponent>(*letterObject.get(), letters[letterCount], font);
+			letterObject->SetPosition(collumnLooper * 36.f, RowCount * 36.f);
+			if (collumnLooper == 0) {
+				keyboardComp->AddKeyLocation({ letterObject->GetWorldTransform().GetPosition().x, letterObject->GetWorldTransform().GetPosition().y, letters[letterCount]});
+			}
+			else {
+				keyboardComp->AddKeyLocation(RowCount, { letterObject->GetWorldTransform().GetPosition().x, letterObject->GetWorldTransform().GetPosition().y, letters[letterCount] });
+			}
+			scene.Add(letterObject);
+			++letterCount;
+			if (letterCount == letters.size()) break;
+		}
+		++RowCount;
 	}
 }
 
@@ -547,6 +612,7 @@ void load()
 	auto smallFont = dae::ResourceManager::GetInstance().LoadFont("Lingua.otf", static_cast<uint8_t>(smallFontSize));
 	auto& input = dae::InputManager::GetInstance();
 	InitializeCommands(input);
+	//Controller Setup
 	{
 		auto keyboard1 = std::make_unique<dae::Gamepad>(0);
 		keyboard1->SetUsed(false);
@@ -560,6 +626,95 @@ void load()
 		gamepad2->SetUsed(true);
 		input.AddGamepad("GamepadPlayer2", std::move(gamepad2));
 	}
+	//Player Setup
+	/* {
+		PlayerInfoTemp playerInfo{"DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},{161,81},
+			"Single Player 1" };
+		ControllerInfo controllerInfo{ "GamepadPlayer1",input };
+		//ScoreInfo scoreInfo{ smallFont, ScoreBoardParentGo };
+
+		auto go = std::make_shared<dae::GameObject>();
+		//go->SetParent(playerInfo.hallways); //on scene startup
+		go->AddComponent<dae::RenderComponent>(*go.get());
+		//FiniteStateMachineSetup
+		{
+
+			go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
+			auto FiniteComp = go->GetComponent<dae::FiniteStateMachineComponent>();
+			{
+				dae::Gamepad* gamepad = controllerInfo.input.GetGamePad(controllerInfo.gamepadName);
+				FiniteComp->AddState<dae::HandleInput>("HandleInput", gamepad);
+				{
+					auto handleInputState = static_cast<dae::HandleInput*>(FiniteComp->GetState("HandleInput"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardUp"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("keyboardDown"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardLeft"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardRight"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardShootTether"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadUp"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadDown"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadLeft"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
+					handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadShootTether"));
+				}
+				FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
+				FiniteComp->AddState<dae::DigDugAttack>("DigDugAttacking", controllerInfo.input.GetGamePad(controllerInfo.gamepadName));
+
+				static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("KeyboardPump"));
+				static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("GamepadPump"));
+				FiniteComp->AddCondition<dae::HasMovementInput>("HasMovementInput");
+				FiniteComp->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
+				FiniteComp->AddCondition < dae::WantsToAttack>("WantsToAttack");
+				FiniteComp->AddCondition<dae::FinishedAttack>("FinishedAttack");
+
+				FiniteComp->AddTransition(
+					FiniteComp->GetState("HandleInput"),
+					FiniteComp->GetState("Running"),
+					FiniteComp->GetCondition("HasMovementInput"));
+
+				FiniteComp->AddTransition(
+					FiniteComp->GetState("Running"),
+					FiniteComp->GetState("HandleInput"),
+					FiniteComp->GetCondition("IsDoneRunning"));
+
+				FiniteComp->AddTransition(
+					FiniteComp->GetState("HandleInput"),
+					FiniteComp->GetState("DigDugAttacking"),
+					FiniteComp->GetCondition("WantsToAttack"));
+
+				FiniteComp->AddTransition(
+					FiniteComp->GetState("DigDugAttacking"),
+					FiniteComp->GetState("HandleInput"),
+					FiniteComp->GetCondition("FinishedAttack"));
+
+				FiniteComp->SetCurrentState(
+					FiniteComp->GetState("HandleInput")
+				);
+			}
+		}
+		//MovementComponent setup
+		go->AddComponent<dae::MovementComponent>(*go.get());
+		go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
+		go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
+		go->GetComponent<dae::MovementComponent>()->SetIsDigger(true);
+
+		go->GetComponent<dae::RenderComponent>()->SetTexture(playerInfo.texturePath, playerInfo.textureSrcRect);
+		go->SetPosition(static_cast<float>(playerInfo.startPos[0]), static_cast<float>(playerInfo.startPos[1]));
+
+		go->AddComponent<dae::DigDugAttackComponent>(*go.get(), SDL_Rect(32, 56, 32, 5), playerInfo.texturePath, 0.3f, 0.2f);
+
+
+		go->AddComponent<dae::PlayerComponent>(*go.get(), playerInfo.name);
+		go->GetComponent<dae::PlayerComponent>()->AddObserver(playerInfo.playerStatDisplay->GetComponent<dae::PlayerInfoComponent>()->GetScoreContainer());
+		go->GetComponent<dae::PlayerComponent>()->AddObserver(playerInfo.gameMaster->GetComponent<dae::GameMasterComponent>()->GetEnemyPresenceObserver());
+		go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8, 1.f);
+		go->GetComponent<dae::HealthComponent>()->AddObserver(playerInfo.playerStatDisplay->GetComponent<dae::PlayerInfoComponent>()->GetHealthContainer());
+		go->GetComponent<dae::HealthComponent>()->AddObserver(playerInfo.gameMaster->GetComponent<dae::GameMasterComponent>()->GetPlayerPresenceObserver());
+		
+		playerInfo.scene.Add(go);
+		controllerInfo.input.AddGameActor(go.get());
+
+	}*/
 	//StartMenu stuff
 	auto& menu = sceneManager.CreateScene("MainMenu");
 	{
@@ -635,7 +790,7 @@ void load()
 			singleScene.Add(playerStatsDisplayGo);
 		}
 		auto gameMaster = std::make_shared<dae::GameObject>();
-		gameMaster->AddComponent<dae::GameMasterComponent>(*gameMaster.get(), "MainMenu", "MainMenu");
+		gameMaster->AddComponent<dae::GameMasterComponent>(*gameMaster.get(), "End", "MainMenu");
 		singleScene.Add(gameMaster);
 		auto hallways = SetupLevelAndReturnHallwaysObject(singleScene, true);
 		PlayerInfo playerInfo{ "DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},{161,81}, 
@@ -686,7 +841,7 @@ void load()
 			coopScene.Add(playerStatsDisplayGo);
 		}
 		auto gameMaster = std::make_shared<dae::GameObject>();
-		gameMaster->AddComponent<dae::GameMasterComponent>(*gameMaster.get(), "MainMenu", "MainMenu");
+		gameMaster->AddComponent<dae::GameMasterComponent>(*gameMaster.get(), "End", "MainMenu");
 		coopScene.Add(gameMaster);
 		auto hallways = SetupLevelAndReturnHallwaysObject(coopScene, true);
 		//Player setup
@@ -742,7 +897,7 @@ void load()
 			pvpScene.Add(playerStatsDisplayGo);
 		}
 		auto gameMaster = std::make_shared<dae::GameObject>();
-		gameMaster->AddComponent<dae::GameMasterComponent>(*gameMaster.get(), "MainMenu", "MainMenu");
+		gameMaster->AddComponent<dae::GameMasterComponent>(*gameMaster.get(), "End", "MainMenu");
 		pvpScene.Add(gameMaster);
 		auto hallways = SetupLevelAndReturnHallwaysObject(pvpScene, true);
 		//Player setup
@@ -771,6 +926,11 @@ void load()
 		go->GetComponent<dae::FPSComponent>()->SetToWriteComponent(go->GetComponent<dae::TextComponent>());
 		pvpScene.Add(go);
 		gameMaster->GetComponent<dae::GameMasterComponent>()->PrepGameMaster(pvpScene);
+	}
+	auto& endScene = dae::SceneManager::GetInstance().CreateScene("End");
+	{
+		SetupLevelAndReturnHallwaysObject(endScene, false);
+		SetupKeyboard(endScene, font,9, input);
 	}
 	SetupSound();
 	dae::ServiceLocator::get_SoundSystem().PlayMusic(0, 2.f);

@@ -85,21 +85,21 @@ void dae::Renderer::RenderTexture(const Texture2D& texture, const float x, const
 	dst.h = static_cast<int>(height);
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), nullptr, &dst);
 }
-void dae::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect src, const SDL_Rect dst) const
+void dae::Renderer::RenderTexture(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst) const
 {
 	SDL_RenderCopy(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst);
 }
 
-void dae::Renderer::RenderTextureOriented(const Texture2D& texture, const SDL_Rect src, const SDL_Rect dst, double angle, SDL_RendererFlip flip, bool centered) const
+void dae::Renderer::RenderTextureOriented(const Texture2D& texture, const SDL_Rect& src, const SDL_Rect& dst, double angle, SDL_RendererFlip flip, bool centered) const
 {
 	auto center = SDL_Point{ 0,0 };
 	if (centered) 
 		center = SDL_Point{ dst.w / 2,dst.h / 2 }; 
 	SDL_RenderCopyEx(GetSDLRenderer(), texture.GetSDLTexture(), &src, &dst, angle, &center, flip);
 }
-//test
-void dae::Renderer::RenderRect(SDL_Rect rect) {
-	SDL_RenderFillRect(GetSDLRenderer(), &rect);
+
+void dae::Renderer::RenderRect(const SDL_Rect& rect) {
+	SDL_RenderDrawRect(GetSDLRenderer(), &rect);
 }
 
 SDL_Window* dae::Renderer::GetSDLWindow()
