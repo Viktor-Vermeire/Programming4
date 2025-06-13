@@ -38,6 +38,7 @@ void dae::RenderComponent::SetDstBox(SDL_Rect box)
 
 void dae::RenderComponent::Render()
 {
+	if (!GetOwner()->m_Active) return;
 	const auto& pos = BaseComponent::GetOwner()->GetWorldTransform().GetPosition();
 	if (m_DstBox.w == 0 && m_DstBox.h == 0) {
 		m_DstBox = m_Box;

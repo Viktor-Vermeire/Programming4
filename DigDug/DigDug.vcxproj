@@ -156,9 +156,11 @@
     <ClCompile Include="Conditions.cpp" />
     <ClCompile Include="DiggingComponent.cpp" />
     <ClCompile Include="EnemyComponent.cpp" />
+    <ClCompile Include="EnemyPresenceObserver.cpp" />
     <ClCompile Include="FloatingComponent.cpp" />
     <ClCompile Include="FygarAttackCommand.cpp" />
     <ClCompile Include="FygarAttackComponent.cpp" />
+    <ClCompile Include="GameMasterComponent.cpp" />
     <ClCompile Include="HallwaysComponent.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="HealthObserver.cpp" />
@@ -168,6 +170,7 @@
     <ClCompile Include="Pickup.cpp" />
     <ClCompile Include="PlayerComponent.cpp" />
     <ClCompile Include="PlayerInfoComponent.cpp" />
+    <ClCompile Include="PlayerPresenceObserver.cpp" />
     <ClCompile Include="PlaySound.cpp" />
     <ClCompile Include="Pump.cpp" />
     <ClCompile Include="RockComponent.cpp" />
@@ -183,9 +186,11 @@
     <ClInclude Include="Conditions.h" />
     <ClInclude Include="DiggingComponent.h" />
     <ClInclude Include="EnemyComponent.h" />
+    <ClInclude Include="EnemyPresenceObserver.h" />
     <ClInclude Include="FloatingComponent.h" />
     <ClInclude Include="FygarAttackCommand.h" />
     <ClInclude Include="FygarAttackComponent.h" />
+    <ClInclude Include="GameMasterComponent.h" />
     <ClInclude Include="HallwaysComponent.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="HealthObserver.h" />
@@ -194,6 +199,7 @@
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="PlayerInfoComponent.h" />
+    <ClInclude Include="PlayerPresenceObserver.h" />
     <ClInclude Include="PlayerState.h" />
     <ClInclude Include="PlaySound.h" />
     <ClInclude Include="Pump.h" />

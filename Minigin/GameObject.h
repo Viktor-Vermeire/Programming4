@@ -68,6 +68,8 @@ namespace dae
 		void UpdateWorldTransform();
 		bool IsToBeDeleted();
 		void SetToBeDeleted(bool value);
+
+		bool m_Active;
 		
 
 		GameObject();

@@ -24,6 +24,8 @@ void dae::EnemyComponent::Update()
 			m_Inflation = 0;
 		}
 	}
+
+
 }
 
 std::vector<dae::GameObject*> dae::EnemyComponent::GetPlayers()

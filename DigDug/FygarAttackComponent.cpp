@@ -54,17 +54,17 @@ void dae::FygarAttackComponent::Update()
 	auto players = dae::SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::PlayerComponent>();
 	auto result = std::find_if(players.begin(), players.end(), [&](GameObject* gameObject) {
 		auto render = GetOwner()->GetComponent<dae::RenderComponent>();
-		if (render) {
+		auto enemyRender = gameObject->GetComponent<dae::RenderComponent>();
+		if (render && enemyRender) {
 			auto enPos = gameObject->GetWorldTransform().GetPosition();
 			auto plPos = GetOwner()->GetWorldTransform().GetPosition();
-			auto rect = SDL_Rect{ static_cast<int>(enPos.x), static_cast<int>(enPos.y), render->GetBox().w, render->GetBox().h };
-			auto plRect = GetWorldFlameRect(*render);
+			auto rect = SDL_Rect{ static_cast<int>(enPos.x), static_cast<int>(enPos.y), enemyRender->GetBox().w, enemyRender->GetBox().h };
+			auto plRect = GetWorldFlameRectCollision(*render);
 			return SDL_HasIntersection(&rect, &plRect);
 		}
 		return SDL_FALSE;
 		});
 	if (result != players.end()) {
-		std::cout << "Got his ass \n";
 		auto health = (*result)->GetComponent<HealthComponent>();
 		if (health) {
 			health->Die();

@@ -13,6 +13,7 @@ dae::GameObject::GameObject()
 {
 	m_WorldTransform = dae::Transform();
 	m_ToBeDeleted = false;
+	m_Active = true;
 }
 
 dae::GameObject::~GameObject() = default;

@@ -9,6 +9,7 @@ namespace dae {
     public:
         PlayerComponent(GameObject& gameobject,std::string name);
         std::string GetName();
+        void Update() override;
         int GetScore();
         void SetScore(int score);
         void AddObserver(IObserver* observer) override;

@@ -15,6 +15,7 @@ namespace dae
 		//bool ProcessInput();
 		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad, std::vector<Command*> commands);
 		void AddGamepad(std::string key, std::unique_ptr<Gamepad> gamepad);
+		Gamepad* GetGamepad(std::string key);
 		void AddGameActor(GameObject* gameActor);
 		//Command* GetCommand(std::string key);
 		int GetGameActorSize();

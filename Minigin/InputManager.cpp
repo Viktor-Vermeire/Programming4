@@ -79,6 +79,10 @@ void dae::InputManager::AddGamepad(std::string key, std::unique_ptr<Gamepad> gam
 	m_GamePads[key] = (std::move(gamepad));
 }
 
+dae::Gamepad* dae::InputManager::GetGamePad(std::string key) {
+	return m_GamePads[key].get();
+}
+
 void dae::InputManager::AddGameActor(GameObject* gameActor)
 {
 	m_GameActors.emplace_back(gameActor);
@@ -94,11 +98,6 @@ std::vector<dae::GameObject*> dae::InputManager::GetPlayers() {
 dae::Command* dae::InputManager::GetCommand(std::string key)
 {
 	return m_Commands[key].get();
-}
-
-dae::Gamepad* dae::InputManager::GetGamePad(std::string key)
-{
-	return m_GamePads[key].get();
 }
 
 bool dae::InputManager::CheckExit()

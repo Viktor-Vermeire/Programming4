@@ -17,6 +17,7 @@ void dae::HandleInput::Enter(GameObject*)
 
 void dae::HandleInput::Execute(GameObject* gameObject)
 {
+	if (!gameObject->m_Active) return;
 	InputManager::GetInstance().ProcessPlayerInput(gameObject, m_GamePad, m_Commands);
 }
 

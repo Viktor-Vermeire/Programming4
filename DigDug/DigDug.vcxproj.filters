@@ -117,6 +117,15 @@
     <ClCompile Include="FygarAttackCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GameMasterComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyPresenceObserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPresenceObserver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Move.h">
@@ -182,9 +191,6 @@
     <ClInclude Include="ScoreObserver.h">
       <Filter>Header Files\Observers</Filter>
     </ClInclude>
-    <ClInclude Include="HealthObserver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="SelectModeCommand.h">
       <Filter>Header Files\Commands</Filter>
     </ClInclude>
@@ -192,6 +198,18 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="FygarAttackCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMasterComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="HealthObserver.h">
+      <Filter>Header Files\Observers</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyPresenceObserver.h">
+      <Filter>Header Files\Observers</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPresenceObserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
