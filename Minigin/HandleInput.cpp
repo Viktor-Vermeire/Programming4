@@ -6,9 +6,8 @@
 #include "vector"
 #include "Command.h"
 
-dae::HandleInput::HandleInput(Gamepad* gamePad)
+dae::HandleInput::HandleInput()
 {
-	m_GamePad = gamePad;
 }
 
 void dae::HandleInput::Enter(GameObject*)
@@ -18,7 +17,9 @@ void dae::HandleInput::Enter(GameObject*)
 void dae::HandleInput::Execute(GameObject* gameObject)
 {
 	if (!gameObject->m_Active) return;
-	InputManager::GetInstance().ProcessPlayerInput(gameObject, m_GamePad, m_Commands);
+	for (auto gamepad : m_Gamepads) {
+		InputManager::GetInstance().ProcessPlayerInput(gameObject, gamepad, m_Commands);
+	}
 }
 
 void dae::HandleInput::Exit(GameObject*)
@@ -28,4 +29,8 @@ void dae::HandleInput::Exit(GameObject*)
 void dae::HandleInput::AddCommand(Command* command)
 {
 	m_Commands.emplace_back(command);
+}
+void dae::HandleInput::AddGamepad(Gamepad* gamepad)
+{
+	m_Gamepads.emplace_back(gamepad);
 }

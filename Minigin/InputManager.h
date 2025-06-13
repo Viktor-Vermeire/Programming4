@@ -15,13 +15,12 @@ namespace dae
 		//bool ProcessInput();
 		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad, std::vector<Command*> commands);
 		void AddGamepad(std::string key, std::unique_ptr<Gamepad> gamepad);
-		Gamepad* GetGamepad(std::string key);
-		void AddGameActor(GameObject* gameActor);
+		void AddGameActor(std::string key,std::shared_ptr<GameObject> gameActor);
 		//Command* GetCommand(std::string key);
 		int GetGameActorSize();
-		std::vector<GameObject*> GetPlayers();
 		Command* GetCommand(std::string key);
 		Gamepad* GetGamePad(std::string key);
+		std::shared_ptr<GameObject> GetGameActor(std::string key);
 
 		bool CheckExit();
 
@@ -35,7 +34,7 @@ namespace dae
 		//std::vector<std::unique_ptr<Command>> m_Commands;
 		std::map<std::string,std::unique_ptr<Gamepad>> m_GamePads;
 		std::map<std::string ,std::unique_ptr<Command>> m_Commands;
-		std::vector<GameObject*> m_GameActors;
+		std::map<std::string, std::shared_ptr<GameObject>> m_GameActors;
 	};
 
 

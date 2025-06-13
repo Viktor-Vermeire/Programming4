@@ -59,14 +59,15 @@ namespace dae{
     
     class DigDugAttack : public State {
     public:
-        DigDugAttack(Gamepad* gamePad);
+        DigDugAttack();
         void Enter(GameObject* GameObject) override;
         void Execute(GameObject*) override;
         void Exit(GameObject*) override;
         void AddCommand(Command* command);
+        void AddGamepad(Gamepad* gamepad);
     private:
         std::vector<Command*> m_Commands;
-        Gamepad* m_Gamepad;
+        std::vector<Gamepad*> m_Gamepads;
     };
 
     class FygarAttack : public State {

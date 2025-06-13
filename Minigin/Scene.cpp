@@ -43,6 +43,25 @@ void dae::Scene::Update()
 	}
 }
 
+
+
+void dae::Scene::SetStartUpFunctor(std::function<void()>* functor, const StartUpInfo& start)
+{
+	m_StartUpFunctor = std::make_unique<std::function<void()>>(*functor);
+	m_StartupInfo = start;
+}
+
+dae::StartUpInfo& dae::Scene::GetStartUpInfo()
+{
+	return m_StartupInfo;
+}
+
+void dae::Scene::ExecuteStartUpFunctor()
+{
+	if (m_StartUpFunctor)
+		(*m_StartUpFunctor.get())();
+}
+
 void dae::Scene::Render() const
 {
 	for (const auto& object : m_objects)

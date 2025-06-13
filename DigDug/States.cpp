@@ -10,6 +10,9 @@
 #include "DigDugAttackComponent.h"
 #include "Command.h"
 #include "Gamepad.h"
+#include "SceneManager.h"
+#include "Scene.h"
+#include "PlayerComponent.h"
 
 void dae::Attacking::Enter(GameObject*)
 {
@@ -36,7 +39,7 @@ void dae::FloatingToPlayer::Enter(GameObject* gameObject)
 	if (floating && render) {
 		render->SetDirection(RenderComponent::RIGHT);
 		GameObject* closestPlayer = nullptr;
-		for (auto player : InputManager::GetInstance().GetPlayers()) {
+		for (auto player : SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::PlayerComponent>()) {
 			if (closestPlayer == nullptr && player->m_Active)
 				closestPlayer = player;
 			else if (
@@ -209,9 +212,8 @@ void dae::Running::Exit(GameObject* gameObject)
 	}
 }
 
-dae::DigDugAttack::DigDugAttack(Gamepad* gamepad)
+dae::DigDugAttack::DigDugAttack()
 {
-	m_Gamepad = gamepad;
 }
 
 
@@ -230,7 +232,8 @@ void dae::DigDugAttack::Execute(GameObject* gameobject)
 	auto comp = gameobject->GetComponent<dae::DigDugAttackComponent>();
 	if (comp)
 		comp->LowerCoolDown();
-	InputManager::GetInstance().ProcessPlayerInput(gameobject, m_Gamepad, m_Commands);
+	for (auto gamepad : m_Gamepads)
+		InputManager::GetInstance().ProcessPlayerInput(gameobject, gamepad, m_Commands);
 }
 
 void dae::DigDugAttack::Exit(GameObject*)
@@ -240,6 +243,11 @@ void dae::DigDugAttack::Exit(GameObject*)
 void dae::DigDugAttack::AddCommand(Command* command)
 {
 	m_Commands.emplace_back(command);
+}
+
+void dae::DigDugAttack::AddGamepad(Gamepad* gamepad)
+{
+	m_Gamepads.emplace_back(gamepad);
 }
 
 void dae::Tethered::Enter(GameObject*)

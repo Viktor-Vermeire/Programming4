@@ -1,9 +1,14 @@
 #pragma once
 #include "SceneManager.h"
 #include "GameObject.h"
+#include "functional"
+#include "vector"
 
 namespace dae
 {
+	struct StartUpInfo {
+		std::vector<std::pair<float, float>> PlayerPositions;
+	};
 	class Scene final
 	{
 		friend Scene& SceneManager::CreateScene(const std::string& name);
@@ -14,11 +19,10 @@ namespace dae
 
 		void RemoveAll();
 
-		
-
-
-
 		void Update();
+		void SetStartUpFunctor(std::function<void()>* functor, const StartUpInfo& startUpInfo);
+		StartUpInfo& GetStartUpInfo();
+		void ExecuteStartUpFunctor();
 		void Render() const;
 		std::string GetName() const;
 
@@ -45,7 +49,10 @@ namespace dae
 	private: 
 		explicit Scene(const std::string& name);
 
+		std::unique_ptr<std::function<void()>> m_StartUpFunctor;
+
 		std::string m_name;
+		StartUpInfo m_StartupInfo;
 		std::vector < std::shared_ptr<GameObject>> m_objects{};
 
 		static unsigned int m_idCounter; 

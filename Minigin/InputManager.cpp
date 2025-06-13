@@ -83,17 +83,20 @@ dae::Gamepad* dae::InputManager::GetGamePad(std::string key) {
 	return m_GamePads[key].get();
 }
 
-void dae::InputManager::AddGameActor(GameObject* gameActor)
+std::shared_ptr<dae::GameObject> dae::InputManager::GetGameActor(std::string key)
 {
-	m_GameActors.emplace_back(gameActor);
+	return m_GameActors[key];
+}
+
+void dae::InputManager::AddGameActor(std::string key,std::shared_ptr<GameObject> gameActor)
+{
+	m_GameActors[key] = gameActor;
 }
 
 int dae::InputManager::GetGameActorSize() {
 	return static_cast<int>(m_GameActors.size());
 }
-std::vector<dae::GameObject*> dae::InputManager::GetPlayers() {
-	return m_GameActors;
-}
+
 
 dae::Command* dae::InputManager::GetCommand(std::string key)
 {

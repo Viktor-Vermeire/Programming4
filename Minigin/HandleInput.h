@@ -10,13 +10,14 @@ namespace dae {
     class HandleInput : public State
     {
     public:
-        HandleInput(Gamepad* gamePad);
+        HandleInput();
         void Enter(GameObject* ) override;
         void Execute(GameObject* gameObject) override;
         void Exit(GameObject* ) override;
         void AddCommand(Command* command);
+        void AddGamepad(Gamepad* gamePad);
     private :
-        Gamepad* m_GamePad;
+        std::vector<Gamepad*> m_Gamepads;
         std::vector<Command*> m_Commands;
         
     };
