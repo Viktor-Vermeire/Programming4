@@ -158,8 +158,6 @@ void dae::KeyboardComponent::ReadHighScoreBinary()
 	std::ifstream inFile(m_FileName, std::ios::binary);
 	if (!inFile) return;
 
-	std::cout << "\nSaved Players (Binary)\n";
-
 	while (inFile)
 	{
 		char tag{};
@@ -176,8 +174,6 @@ void dae::KeyboardComponent::ReadHighScoreBinary()
 		if (!inFile.read(reinterpret_cast<char*>(&score), sizeof(int))) break;
 
 		m_SavedScores.emplace_back(std::pair{ name, score });
-
-		std::cout << "Name: " << name << ", Score: " << score << '\n';
 	}
 
 	inFile.close();

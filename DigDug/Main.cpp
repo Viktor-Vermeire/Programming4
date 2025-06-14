@@ -89,25 +89,6 @@ void InitializeCommands(dae::InputManager& input)
 
 	input.AddCommand<dae::SkipCommand>("KeyBoardSkip", SDL_SCANCODE_F1, false);
 	input.AddCommand<dae::ToggleSoundCommand>("KeyboardToggleSound", SDL_SCANCODE_F2, false);
-	/*input.AddCommand<dae::Move>(1, true, dae::RenderComponent::UP);
-	input.AddCommand<dae::Move>(2, true, dae::RenderComponent::DOWN);
-	input.AddCommand<dae::Move>(4, true, dae::RenderComponent::LEFT);
-	input.AddCommand<dae::Move>(8, true, dae::RenderComponent::RIGHT);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_W, false, dae::RenderComponent::UP);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_S, false, dae::RenderComponent::DOWN);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_A, false, dae::RenderComponent::LEFT);
-	input.AddCommand<dae::Move>(SDL_SCANCODE_D, false, dae::RenderComponent::RIGHT);
-	input.AddCommand<dae::Pump>(SDL_SCANCODE_E, false);
-
-	input.AddCommand<dae::DigDugAttackCommand>(SDL_SCANCODE_E, false);
-	input.AddCommand<dae::Suicide>(32768, true);
-	input.AddCommand<dae::Suicide>(SDL_SCANCODE_C, false);
-	input.AddCommand<dae::Pickup>(16384, true, 10);
-	input.AddCommand<dae::Pickup>(SDL_SCANCODE_Z, false, 10);
-	input.AddCommand<dae::Pickup>(8192, true, 100);
-	input.AddCommand<dae::Pickup>(SDL_SCANCODE_X, false, 100);
-	input.AddCommand<dae::PlaySound>(SDL_SCANCODE_F, false, 0);
-	input.AddCommand<dae::PlaySound>(4096, true, 0);*/
 }
 struct PlayerInfoTemp {
 	std::string texturePath;
@@ -143,90 +124,6 @@ struct EnemyInfo {
 	std::vector<SDL_Rect> fygarFlameRects;
 };
 
-/*
-void SetupPlayer(const PlayerInfo& playerInfo, const ControllerInfo& controllerInfo, const ScoreInfo&) {
-	auto go = std::make_shared<dae::GameObject>();
-	go->SetParent(playerInfo.hallways);
-	go->AddComponent<dae::RenderComponent>(*go.get());
-	
-	//FiniteStateMachineSetup
-	{
-		go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
-		auto FiniteComp = go->GetComponent<dae::FiniteStateMachineComponent>();
-		{
-			dae::Gamepad* gamepad = controllerInfo.input.GetGamePad(controllerInfo.gamepadName);
-			FiniteComp->AddState<dae::HandleInput>("HandleInput", gamepad);
-			{
-				auto handleInputState = static_cast<dae::HandleInput*>(FiniteComp->GetState("HandleInput"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardUp"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("keyboardDown"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardLeft"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardRight"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardShootTether"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadUp"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadDown"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadLeft"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadShootTether"));
-			}
-			FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
-			FiniteComp->AddState<dae::DigDugAttack>("DigDugAttacking", controllerInfo.input.GetGamePad(controllerInfo.gamepadName));
-
-			static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("KeyboardPump"));
-			static_cast<dae::DigDugAttack*>(FiniteComp->GetState("DigDugAttacking"))->AddCommand(controllerInfo.input.GetCommand("GamepadPump"));
-			FiniteComp->AddCondition<dae::HasMovementInput>("HasMovementInput");
-			FiniteComp->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
-			FiniteComp->AddCondition < dae::WantsToAttack>("WantsToAttack");
-			FiniteComp->AddCondition<dae::FinishedAttack>("FinishedAttack");
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetState("Running"),
-				FiniteComp->GetCondition("HasMovementInput"));
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("Running"),
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetCondition("IsDoneRunning"));
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetState("DigDugAttacking"),
-				FiniteComp->GetCondition("WantsToAttack"));
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("DigDugAttacking"),
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetCondition("FinishedAttack"));
-
-			FiniteComp->SetCurrentState(
-				FiniteComp->GetState("HandleInput")
-			);
-		}
-	}
-	
-	//MovementComponent setup
-	go->AddComponent<dae::MovementComponent>(*go.get());
-	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
-	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
-	go->GetComponent<dae::MovementComponent>()->SetIsDigger(true);
-
-	go->GetComponent<dae::RenderComponent>()->SetTexture(playerInfo.texturePath, playerInfo.textureSrcRect);
-	go->SetPosition(static_cast<float>(playerInfo.startPos[0]), static_cast<float>(playerInfo.startPos[1]));
-
-	go->AddComponent<dae::DigDugAttackComponent>(*go.get(), SDL_Rect(32, 56, 32, 5), playerInfo.texturePath, 0.3f, 0.2f);
-
-	go->AddComponent<dae::PlayerComponent>(*go.get(), playerInfo.name);
-	go->GetComponent<dae::PlayerComponent>()->AddObserver(playerInfo.playerStatDisplay->GetComponent<dae::PlayerInfoComponent>()->GetScoreContainer());
-	go->GetComponent<dae::PlayerComponent>()->AddObserver(playerInfo.gameMaster->GetComponent<dae::GameMasterComponent>()->GetEnemyPresenceObserver());
-	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8,1.f);
-	go->GetComponent<dae::HealthComponent>()->AddObserver(playerInfo.playerStatDisplay->GetComponent<dae::PlayerInfoComponent>()->GetHealthContainer());
-	go->GetComponent<dae::HealthComponent>()->AddObserver(playerInfo.gameMaster->GetComponent<dae::GameMasterComponent>()->GetPlayerPresenceObserver());
-	
-	playerInfo.scene.Add(go);
-	controllerInfo.input.AddGameActor(playerInfo.name,go.get());
-	
-}*/
 void SetupGeneralPlayer(const PlayerInfoTemp& playerInfo, const ControllerInfo& controllerInfo) {
 		auto player = std::make_unique<dae::GameObject>();
 
@@ -318,84 +215,6 @@ void SetupGeneralPlayer(const PlayerInfoTemp& playerInfo, const ControllerInfo& 
 
 	controllerInfo.input.AddGameActor(playerInfo.name, std::move(player));
 }
-/*
-void SetupFygarPlayer(const FygarPlayerInfo& playerInfo, const ControllerInfo& controllerInfo, const ScoreInfo&) {
-	auto go = std::make_shared<dae::GameObject>();
-	go->SetParent(playerInfo.hallways);
-	go->AddComponent<dae::RenderComponent>(*go.get());
-	{
-		go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
-		auto FiniteComp = go->GetComponent<dae::FiniteStateMachineComponent>();
-		{
-			FiniteComp->AddState<dae::HandleInput>("HandleInput");
-			{
-				auto handleInputState = static_cast<dae::HandleInput*>(FiniteComp->GetState("HandleInput"));
-				for (auto name : controllerInfo.gamepadNames) {
-					handleInputState->AddGamepad(controllerInfo.input.GetGamePad(name));
-				}
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardUp"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("keyboardDown"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardLeft"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardRight"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardShootTether"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadUp"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadDown"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadLeft"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadFygarAttack"));
-				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardFygarAttack"));
-			}
-			FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
-			FiniteComp->AddState<dae::FygarAttack>("FygarAttacking");
-			
-			FiniteComp->AddCondition<dae::HasMovementInput>("HasMovementInput");
-			FiniteComp->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
-			FiniteComp->AddCondition<dae::FygarWantsToAttack>("FygarWantsToAttack");
-			FiniteComp->AddCondition<dae::FygarFinishedAttack>("FygarFinishedAttack");
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetState("Running"),
-				FiniteComp->GetCondition("HasMovementInput"));
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("Running"),
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetCondition("IsDoneRunning"));
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetState("FygarAttacking"),
-				FiniteComp->GetCondition("FygarWantsToAttack"));
-
-			FiniteComp->AddTransition(
-				FiniteComp->GetState("FygarAttacking"),
-				FiniteComp->GetState("HandleInput"),
-				FiniteComp->GetCondition("FygarFinishedAttack"));
-
-			FiniteComp->SetCurrentState(
-				FiniteComp->GetState("HandleInput")
-			);
-		}
-	}
-	go->AddComponent<dae::MovementComponent>(*go.get());
-	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
-	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
-	go->GetComponent<dae::MovementComponent>()->SetIsDigger(false);
-
-	
-
-	go->GetComponent<dae::RenderComponent>()->SetTexture(playerInfo.texturePath, playerInfo.textureSrcRect);
-	go->AddComponent<dae::FygarAttackComponent>(*go.get(), playerInfo.fygarFlameRects, playerInfo.texturePath, 1.f);
-	go->SetPosition(static_cast<float>(playerInfo.startPos[0]), static_cast<float>(playerInfo.startPos[1]));
-
-	go->AddComponent<dae::EnemyComponent>(*go.get(), 4, 100,3.f);
-	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8, 1.f);
-	go->GetComponent<dae::HealthComponent>()->AddObserver(playerInfo.playerStatDisplay->GetComponent<dae::PlayerInfoComponent>()->GetHealthContainer());
-	
-	playerInfo.scene.Add(go);
-	controllerInfo.input.AddGameActor(playerInfo.name,go.get());
-}*/
 void SetupGeneralFygarPlayer(const FygarPlayerInfoTemp& playerInfo, const ControllerInfo& controllerInfo) {
 	auto go = std::make_unique<dae::GameObject>();
 	go->AddComponent<dae::RenderComponent>(*go.get());
@@ -561,17 +380,8 @@ void SetupEnemy(EnemyInfo enemyInfo, std::vector<std::pair<float, float>> locati
 		go->GetComponent<dae::RenderComponent>()->SetTexture(enemyInfo.texturePath, enemyInfo.textureSrcRect);
 		go->SetPosition(static_cast<float>(x), static_cast<float>(y));
 
-
-		/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
-		gamepad->SetUsed(usesGamePad);
-		input.AddGamepad(std::move(gamepad));*/
-
-
 		go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8, 1.f);
 		go->AddComponent<dae::EnemyComponent>(*go.get(), 3, enemyInfo.scoreValue, 3.f);
-		//auto healthComp = go->GetComponent<dae::HealthComponent>();
-		//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
-		//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
 		enemyInfo.scene.Add(std::move(go));
 	}
 }
@@ -818,9 +628,6 @@ void load()
 	auto& menu = sceneManager.CreateScene("MainMenu");
 	{
 		SetupLevelAndReturnHallwaysObject(menu, false);
-		/*auto gamePad = std::make_unique<dae::Gamepad>(0);
-		gamePad->SetUsed(true);
-		input.AddGamepad("TitleScreen", std::move(gamePad));*/
 		int width = 0;
 		int height = 0;
 		SDL_GetWindowSize(dae::Renderer::GetInstance().GetSDLWindow(), &width, &height);

@@ -39,8 +39,8 @@ void dae::FloatingToPlayer::Enter(GameObject* gameObject)
 	if (floating && render) {
 		render->SetDirection(RenderComponent::RIGHT);
 		GameObject* closestPlayer = nullptr;
-		for (auto player : SceneManager::GetInstance().GetActiveScene()->findGameObjectsWithComponent<dae::PlayerComponent>()) {
-			if (closestPlayer == nullptr && player->m_Active)
+		for (auto player : SceneManager::GetInstance().GetActiveScene()->findActiveGameObjectsWithComponent<dae::PlayerComponent>()) {
+			if (closestPlayer == nullptr )
 				closestPlayer = player;
 			else if (
 				glm::distance(gameObject->GetWorldTransform().GetPosition(),
