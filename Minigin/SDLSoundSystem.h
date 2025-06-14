@@ -18,6 +18,7 @@ namespace dae {
 		void AddSongs(std::vector<const char*> effects) override;
 		void PlayEffect(const unsigned short id, const float volume) override;
 		void PlayMusic(const unsigned short id, const float volume) override;
+		void ToggleMute() override;
 		
 	private:
 		std::unique_ptr<SDLSoundSystemImpl> m_SDLSoundSystemImpl;

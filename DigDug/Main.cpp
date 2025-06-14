@@ -46,6 +46,8 @@
 #include "GameMasterComponent.h"
 #include "KeyboardComponent.h"
 #include "KeyboardCommand.h"
+#include "SkipCommand.h"
+#include "ToggleSoundCommand.h"
 
 namespace fs = std::filesystem;
 
@@ -67,18 +69,12 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::FygarAttackCommand>("GamepadFygarAttack", 4096u, true);
 	input.AddCommand<dae::FygarAttackCommand>("KeyboardFygarAttack", SDL_SCANCODE_E, false);
 
-	input.AddCommand<dae::Suicide>("GamepadSuicide", 32768u, true);
-	input.AddCommand<dae::Suicide>("KeyboardSuicide", SDL_SCANCODE_C, false);
-	input.AddCommand<dae::Pickup>("GamepadPickupSmall", 16384u, true, 10);
-	input.AddCommand<dae::Pickup>("KeyboardPickupSmall", SDL_SCANCODE_Z, false, 10);
-	input.AddCommand<dae::Pickup>("GamepadPickupLarge", 8192u, true, 100);
-	input.AddCommand<dae::Pickup>("KeyboardPickupLarge", SDL_SCANCODE_X, false, 100);
-	input.AddCommand<dae::PlaySound>("KeyboardPlaySound", SDL_SCANCODE_F, false, 0);
-	input.AddCommand<dae::PlaySound>("GamepadPlaySound", 4096u, true, 0);
-
 	input.AddCommand<dae::SelectModeCommand>("SelectModeSingle", 4096u, true, "Single", 1);
 	input.AddCommand<dae::SelectModeCommand>("SelectModeCoop", 8192u, true, "Coop", 2);
 	input.AddCommand<dae::SelectModeCommand>("SelectModePvP", 16384u, true, "PvP", 1);
+	input.AddCommand<dae::SelectModeCommand>("KeyboardSelectModeSingle", SDL_SCANCODE_A, false, "Single", 1);
+	input.AddCommand<dae::SelectModeCommand>("KeyboardSelectModeCoop", SDL_SCANCODE_B, false, "Coop", 2);
+	input.AddCommand<dae::SelectModeCommand>("KeyboardSelectModePvP", SDL_SCANCODE_X, false, "PvP", 1);
 
 	input.AddCommand<dae::KeyboardMoveCommand>("GamepadKeyboardUp", 1u, true, std::pair{ 0.f,-1.f });
 	input.AddCommand<dae::KeyboardMoveCommand>("GamepadKeyboardDown", 2u, true, std::pair{ 0.f,1.f });
@@ -94,6 +90,8 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::KeyboardConfirmCommand>("KeyboardKeyboardConfirm", SDL_SCANCODE_E, false);
 	input.AddCommand<dae::SaveScoreCommand>("KeyboardKeyboardSave", SDL_SCANCODE_Q, false);
 
+	input.AddCommand<dae::SkipCommand>("KeyBoardSkip", SDL_SCANCODE_F1, false);
+	input.AddCommand<dae::ToggleSoundCommand>("KeyboardToggleSound", SDL_SCANCODE_F2, false);
 	/*input.AddCommand<dae::Move>(1, true, dae::RenderComponent::UP);
 	input.AddCommand<dae::Move>(2, true, dae::RenderComponent::DOWN);
 	input.AddCommand<dae::Move>(4, true, dae::RenderComponent::LEFT);
@@ -162,7 +160,6 @@ struct ScoreInfo {
 struct EnemyInfo {
 	std::string texturePath;
 	SDL_Rect textureSrcRect;
-	int startPos[2];
 	std::vector<SDL_Rect> runningAnimLocations;
 	std::vector<SDL_Rect> floatingAnimLocations;
 	dae::Scene& scene;
@@ -284,6 +281,8 @@ void SetupGeneralPlayer(const PlayerInfoTemp& playerInfo, const ControllerInfo& 
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadLeft"));
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadShootTether"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyBoardSkip"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardToggleSound"));
 			}
 			FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
 			FiniteComp->AddState<dae::DigDugAttack>("DigDugAttacking");
@@ -294,6 +293,8 @@ void SetupGeneralPlayer(const PlayerInfoTemp& playerInfo, const ControllerInfo& 
 			}
 			digDugAttack->AddCommand(controllerInfo.input.GetCommand("KeyboardPump"));
 			digDugAttack->AddCommand(controllerInfo.input.GetCommand("GamepadPump"));
+			digDugAttack->AddCommand(controllerInfo.input.GetCommand("KeyBoardSkip"));
+			digDugAttack->AddCommand(controllerInfo.input.GetCommand("KeyboardToggleSound"));
 			FiniteComp->AddCondition<dae::HasMovementInput>("HasMovementInput");
 			FiniteComp->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
 			FiniteComp->AddCondition < dae::WantsToAttack>("WantsToAttack");
@@ -443,6 +444,8 @@ void SetupGeneralFygarPlayer(const FygarPlayerInfoTemp& playerInfo, const Contro
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadRight"));
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("GamepadFygarAttack"));
 				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardFygarAttack"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyBoardSkip"));
+				handleInputState->AddCommand(controllerInfo.input.GetCommand("KeyboardToggleSound"));
 			}
 			FiniteComp->AddState<dae::Running>("Running", playerInfo.runningAnimLocations, 0.3f);
 			FiniteComp->AddState<dae::FygarAttack>("FygarAttacking");
@@ -493,104 +496,108 @@ void SetupGeneralFygarPlayer(const FygarPlayerInfoTemp& playerInfo, const Contro
 
 	controllerInfo.input.AddGameActor(playerInfo.name, std::move(go));
 }
-void SetupEnemy(EnemyInfo enemyInfo) {
-	auto go = std::make_unique<dae::GameObject>();
-	go->AddComponent<dae::RenderComponent>(*go.get());
-	//SetupFiniteStateMachine (maybe seperate method later)
-	{
-		go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToPlayer>("FloatingToPlayer", enemyInfo.floatingAnimLocations, 0.3f);
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToGrid>("FloatingToGrid", enemyInfo.floatingAnimLocations, 0.3f);
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Running>("Running", enemyInfo.runningAnimLocations, 0.3f);
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Idle>("Idle");
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Tethered>("Tethered");
+void SetupEnemy(EnemyInfo enemyInfo, std::vector<std::pair<float, float>> locations) {
+	for (int looper{ 0 }; looper < locations.size(); ++looper) {
+		float x = locations[looper].first * 16;
+		float y = locations[looper].second * 16;
+		auto go = std::make_unique<dae::GameObject>();
+		go->AddComponent<dae::RenderComponent>(*go.get());
+		//SetupFiniteStateMachine (maybe seperate method later)
+		{
+			go->AddComponent<dae::FiniteStateMachineComponent>(*go.get());
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToPlayer>("FloatingToPlayer", enemyInfo.floatingAnimLocations, 0.3f);
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::FloatingToGrid>("FloatingToGrid", enemyInfo.floatingAnimLocations, 0.3f);
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Running>("Running", enemyInfo.runningAnimLocations, 0.3f);
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Idle>("Idle");
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddState<dae::Tethered>("Tethered");
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::WantsToFloat>("WantsToFloat", 5.0f); // reset later
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::HasNearbyHallway>("HasNearbyHallway", 2.0f);
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::HasValidDirection>("HasValidDirection");
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsInGrid>("IsInGrid");
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsTethered>("IsTethered");
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsUntethered>("IsUntethered");
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsDoneRunning>("IsDoneRunning");
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::WantsToFloat>("WantsToFloat", 5.0f); // reset later
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::HasNearbyHallway>("HasNearbyHallway", 2.0f);
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::HasValidDirection>("HasValidDirection");
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsInGrid>("IsInGrid");
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsTethered>("IsTethered");
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddCondition<dae::IsUntethered>("IsUntethered");
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("HasValidDirection"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("HasValidDirection"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsDoneRunning"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsDoneRunning"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToPlayer"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("WantsToFloat"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToPlayer"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("WantsToFloat"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToPlayer"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToGrid"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("HasNearbyHallway"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToPlayer"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToGrid"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("HasNearbyHallway"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToGrid"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsInGrid"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("FloatingToGrid"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsInGrid"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsTethered"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsTethered"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsUntethered"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsUntethered"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsUntethered"));
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsUntethered"));
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsTethered"));
-
-		
+			go->GetComponent<dae::FiniteStateMachineComponent>()->AddTransition(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Running"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Tethered"),
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetCondition("IsTethered"));
 
 
-		go->GetComponent<dae::FiniteStateMachineComponent>()->SetCurrentState(
-			go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"));
+
+
+			go->GetComponent<dae::FiniteStateMachineComponent>()->SetCurrentState(
+				go->GetComponent<dae::FiniteStateMachineComponent>()->GetState("Idle"));
+		}
+		//MovementComponent setup
+		go->AddComponent<dae::MovementComponent>(*go.get());
+		go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
+		go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
+		go->AddComponent<dae::FloatingComponent>(*go.get(), 30.f);
+
+		if (!enemyInfo.fygarFlameRects.empty()) {
+			go->AddComponent<dae::FygarAttackComponent>(*go.get(), enemyInfo.fygarFlameRects, enemyInfo.texturePath, 1.f);
+		}
+		go->SetParent(enemyInfo.hallways);
+
+
+		go->GetComponent<dae::RenderComponent>()->SetTexture(enemyInfo.texturePath, enemyInfo.textureSrcRect);
+		go->SetPosition(static_cast<float>(x), static_cast<float>(y));
+
+
+		/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
+		gamepad->SetUsed(usesGamePad);
+		input.AddGamepad(std::move(gamepad));*/
+
+
+		go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8, 1.f);
+		go->AddComponent<dae::EnemyComponent>(*go.get(), 3, 100, 3.f);
+		//auto healthComp = go->GetComponent<dae::HealthComponent>();
+		//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
+		//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
+		enemyInfo.scene.Add(std::move(go));
 	}
-	//MovementComponent setup
-	go->AddComponent<dae::MovementComponent>(*go.get());
-	go->GetComponent<dae::MovementComponent>()->SetDistancePerMove(16); //Remove these magic numbers
-	go->GetComponent<dae::MovementComponent>()->SetTimePerMove(0.5f);
-	go->AddComponent<dae::FloatingComponent>(*go.get(), 30.f);
-
-	if (!enemyInfo.fygarFlameRects.empty()) {
-		go->AddComponent<dae::FygarAttackComponent>(*go.get(), enemyInfo.fygarFlameRects, enemyInfo.texturePath, 1.f);
-	}
-	go->SetParent(enemyInfo.hallways);
-
-
-	go->GetComponent<dae::RenderComponent>()->SetTexture(enemyInfo.texturePath, enemyInfo.textureSrcRect);
-	go->SetPosition(static_cast<float>(enemyInfo.startPos[0]), static_cast<float>(enemyInfo.startPos[1]));
-
-
-	/*std::unique_ptr gamepad = std::make_unique<dae::Gamepad>(input.GetGameActorSize());
-	gamepad->SetUsed(usesGamePad);
-	input.AddGamepad(std::move(gamepad));*/
-
-
-	go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8,1.f);
-	go->AddComponent<dae::EnemyComponent>(*go.get(), 3, 100, 3.f);
-	//auto healthComp = go->GetComponent<dae::HealthComponent>();
-	//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
-	//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
-	enemyInfo.scene.Add(std::move(go));
 }
 
 void SetupHallwaySources(dae::GameObject* go) {
@@ -610,17 +617,75 @@ void SetupHallwaySources(dae::GameObject* go) {
 	go->GetComponent<dae::HallwaysComponent>()->AddSource(dae::HallwaysComponent::SKY, SDL_Rect(181, 99, 0, 0));
 }
 
-void SetupTunnels(dae::GameObject* go) {
+void SetupTunnels(dae::GameObject* go, int seed) {
 	auto comp = go->GetComponent<dae::HallwaysComponent>();
 	if (comp) {
-		comp->SetHallwayType(std::pair<int, int>(10, 10), dae::HallwaysComponent::LEFTTOPCORNER);
-		comp->SetHallwayType(std::pair<int, int>(11, 10), dae::HallwaysComponent::VERTICALTHROUGH);
-		comp->SetHallwayType(std::pair<int, int>(12, 10), dae::HallwaysComponent::BOTTOMCLOSED);
-		comp->SetHallwayType(std::pair<int, int>(10, 11), dae::HallwaysComponent::RIGHTCLOSED);
-		comp->SetHallwayType(std::pair<int, int>(10, 18), dae::HallwaysComponent::LEFTTOPCORNER);
-		comp->SetHallwayType(std::pair<int, int>(11, 18), dae::HallwaysComponent::VERTICALTHROUGH);
-		comp->SetHallwayType(std::pair<int, int>(12, 18), dae::HallwaysComponent::BOTTOMCLOSED);
-		comp->SetHallwayType(std::pair<int, int>(10, 19), dae::HallwaysComponent::RIGHTCLOSED);
+		switch (seed) {
+		case 0:
+			comp->SetHallwayType(std::pair<int, int>(10, 24), dae::HallwaysComponent::RIGHTCLOSED);
+			comp->SetHallwayType(std::pair<int, int>(10, 9), dae::HallwaysComponent::LEFTCLOSED);
+			for (int looper{ 0 }; looper < 16; ++looper) {
+				comp->SetHallwayType(std::pair<int, int>(10, 10+looper), dae::HallwaysComponent::HORIZONTALTHROUGH);
+			}
+			comp->SetHallwayType(std::pair<int, int>(7, 9), dae::HallwaysComponent::TOPCLOSED);
+			comp->SetHallwayType(std::pair<int, int>(26, 9), dae::HallwaysComponent::BOTTOMCLOSED);
+			for (int looper{ 0 }; looper < 20; ++looper) {
+				comp->SetHallwayType(std::pair<int, int>(8 + looper, 9 ), dae::HallwaysComponent::VERTICALTHROUGH);
+			}
+			comp->SetHallwayType(std::pair<int, int>(7, 20), dae::HallwaysComponent::TOPCLOSED);
+			comp->SetHallwayType(std::pair<int, int>(25, 20), dae::HallwaysComponent::BOTTOMCLOSED);
+			for (int looper{ 0 }; looper < 19; ++looper) {
+				comp->SetHallwayType(std::pair<int, int>(8 + looper, 20), dae::HallwaysComponent::VERTICALTHROUGH);
+			}
+			comp->SetHallwayType(std::pair<int, int>(7, 26), dae::HallwaysComponent::TOPCLOSED);
+			comp->SetHallwayType(std::pair<int, int>(26, 26), dae::HallwaysComponent::BOTTOMCLOSED);
+			for (int looper{ 0 }; looper < 20; ++looper) {
+				comp->SetHallwayType(std::pair<int, int>(8 + looper, 26), dae::HallwaysComponent::VERTICALTHROUGH);
+			}
+			break;
+		case 1:
+			for (int looper{ 0 }; looper < 6; ++looper) {
+					comp->SetHallwayType(std::pair<int, int>(10, (3 + (looper * 2))), dae::HallwaysComponent::LEFTTOPCORNER);
+					comp->SetHallwayType(std::pair<int, int>(11, (3 + (looper * 2))), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(12, (3 + (looper * 2))), dae::HallwaysComponent::BOTTOMCLOSED);
+					comp->SetHallwayType(std::pair<int, int>(10, (4 + (looper * 2))), dae::HallwaysComponent::RIGHTCLOSED);
+					comp->SetHallwayType(std::pair<int, int>(20, 1 + (looper * 2)), dae::HallwaysComponent::LEFTTOPCORNER);
+					comp->SetHallwayType(std::pair<int, int>(21, 1 + (looper * 2)), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(22, 1 + (looper * 2)), dae::HallwaysComponent::BOTTOMCLOSED);
+					comp->SetHallwayType(std::pair<int, int>(20, 2 + (looper * 2)), dae::HallwaysComponent::RIGHTCLOSED);
+			}
+			for (int looper{ 0 }; looper < 6; ++looper) {
+					comp->SetHallwayType(std::pair<int, int>(15, (17 + (looper * 2))), dae::HallwaysComponent::LEFTTOPCORNER);
+					comp->SetHallwayType(std::pair<int, int>(16, (17 + (looper * 2))), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(17, (17 + (looper * 2))), dae::HallwaysComponent::BOTTOMCLOSED);
+					comp->SetHallwayType(std::pair<int, int>(15, (18 + (looper * 2))), dae::HallwaysComponent::RIGHTCLOSED);
+					comp->SetHallwayType(std::pair<int, int>(25, 19 + (looper * 2)), dae::HallwaysComponent::LEFTTOPCORNER);
+					comp->SetHallwayType(std::pair<int, int>(26, 19 + (looper * 2)), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(27, 19 + (looper * 2)), dae::HallwaysComponent::BOTTOMCLOSED);
+					comp->SetHallwayType(std::pair<int, int>(25, 20 + (looper * 2)), dae::HallwaysComponent::RIGHTCLOSED);
+			}
+			break;
+		default:
+			for (int outerLooper{ 0 }; outerLooper < 3; ++outerLooper) {
+				for (int looper{ 0 }; looper < 7; ++looper) {
+					comp->SetHallwayType(std::pair<int, int>(10 + (outerLooper * 6), (3 + (looper * 5))), dae::HallwaysComponent::LEFTTOPCORNER);
+					comp->SetHallwayType(std::pair<int, int>(10 + (outerLooper * 6), (4 + (looper * 5))), dae::HallwaysComponent::HORIZONTALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(10 + (outerLooper * 6), (5 + (looper * 5))), dae::HallwaysComponent::HORIZONTALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(10 + (outerLooper * 6), (6 + (looper * 5))), dae::HallwaysComponent::RIGHTTOPCORNER);
+
+					comp->SetHallwayType(std::pair<int, int>(11 + (outerLooper * 6), (3 + (looper * 5))), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(12 + (outerLooper * 6), (3 + (looper * 5))), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(11 + (outerLooper * 6), (6 + (looper * 5))), dae::HallwaysComponent::VERTICALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(12 + (outerLooper * 6), (6 + (looper * 5))), dae::HallwaysComponent::VERTICALTHROUGH);
+
+					comp->SetHallwayType(std::pair<int, int>(13 + (outerLooper * 6), (3 + (looper * 5))), dae::HallwaysComponent::LEFTBOTTOMCORNER);
+					comp->SetHallwayType(std::pair<int, int>(13 + (outerLooper * 6), (4 + (looper * 5))), dae::HallwaysComponent::HORIZONTALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(13 + (outerLooper * 6), (5 + (looper * 5))), dae::HallwaysComponent::HORIZONTALTHROUGH);
+					comp->SetHallwayType(std::pair<int, int>(13 + (outerLooper * 6), (6 + (looper * 5))), dae::HallwaysComponent::RIGHTBOTTOMCORNER);
+				}
+			}
+
+		}
 	}
 }
 
@@ -654,6 +719,7 @@ void SetupKeyboard(dae::Scene& scene, std::shared_ptr<dae::Font> font, int lette
 	handleInput->AddCommand(input.GetCommand("KeyboardKeyboardSave"));
 	handleInput->AddGamepad(input.GetGamePad("GamepadPlayer1"));
 	handleInput->AddGamepad(input.GetGamePad("KeyboardPlayer1"));
+	handleInput->AddCommand(input.GetCommand("KeyboardToggleSound"));
 	finiteComp->SetCurrentState(handleInput);
 	auto keyboardParentPtr = keyboardParent.get();
 	scene.Add(std::move(keyboardParent));
@@ -800,6 +866,11 @@ void load()
 		handleInput->AddCommand(input.GetCommand("SelectModeSingle"));
 		handleInput->AddCommand(input.GetCommand("SelectModeCoop"));
 		handleInput->AddCommand(input.GetCommand("SelectModePvP"));
+		handleInput->AddCommand(input.GetCommand("KeyboardSelectModeSingle"));
+		handleInput->AddCommand(input.GetCommand("KeyboardSelectModeCoop"));
+		handleInput->AddCommand(input.GetCommand("KeyboardSelectModePvP"));
+		handleInput->AddCommand(input.GetCommand("KeyboardToggleSound"));
+		handleInput->AddGamepad(input.GetGamePad("KeyboardPlayer1"));
 		handleInput->AddGamepad(input.GetGamePad("GamepadPlayer1"));
 		fini->SetCurrentState(handleInput);
 		auto mainMenuPtr = mainMenuBackground.get();
@@ -880,15 +951,16 @@ void load()
 
 		auto hallways = SetupLevelAndReturnHallwaysObject(singleScene, true);
 		
-		SetupTunnels(hallways);
-		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),{ 160,160 },
+		SetupTunnels(hallways, 3);
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),
 			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene, hallways };
-		
-		SetupEnemy(enemyInfo);
-		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15), { 288,160 },
+		std::vector<std::pair<float, float>> positions = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
+		SetupEnemy(enemyInfo, positions);
+		std::vector<std::pair<float, float>> positions2 = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
 			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene, hallways, 
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)}};
-		SetupEnemy(enemyInfo2);
+		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
@@ -951,15 +1023,16 @@ void load()
 
 		auto hallways = SetupLevelAndReturnHallwaysObject(singleScene2, true);
 
-		SetupTunnels(hallways);
-		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),{ 160,160 },
+		SetupTunnels(hallways,1);
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),
 			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene2, hallways };
-
-		SetupEnemy(enemyInfo);
-		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15), { 288,160 },
+		std::vector<std::pair<float, float>> positions = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
+		SetupEnemy(enemyInfo, positions);
+		std::vector<std::pair<float, float>> positions2 = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
 			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene2, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
-		SetupEnemy(enemyInfo2);
+		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
@@ -1022,15 +1095,16 @@ void load()
 
 		auto hallways = SetupLevelAndReturnHallwaysObject(singleScene3, true);
 
-		SetupTunnels(hallways);
-		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),{ 160,160 },
+		SetupTunnels(hallways,0);
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),
 			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways };
-
-		SetupEnemy(enemyInfo);
-		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15), { 288,160 },
+		std::vector<std::pair<float, float>> positions = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
+		SetupEnemy(enemyInfo, positions);
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
 			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
-		SetupEnemy(enemyInfo2);
+		std::vector<std::pair<float, float>> positions2 = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
+		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
@@ -1097,10 +1171,16 @@ void load()
 			lambda(players, coopScene.GetStartUpInfo().PlayerPositions);
 			 });
 		coopScene.SetStartUpFunctor(&functor, startUpInfo);
-		SetupTunnels(hallways);
-		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), { 160,160 }, 
+		SetupTunnels(hallways,1);
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), 
 			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene, hallways };
-		SetupEnemy(enemyInfo);
+		std::vector<std::pair<float, float>> positions = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
+		SetupEnemy(enemyInfo, positions);
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
+		std::vector<std::pair<float, float>> positions2 = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
+		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
@@ -1167,10 +1247,17 @@ void load()
 			lambda(players, coopScene2.GetStartUpInfo().PlayerPositions);
 			});
 		coopScene2.SetStartUpFunctor(&functor, startUpInfo);
-		SetupTunnels(hallways);
-		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), { 160,160 },
+		SetupTunnels(hallways,1);
+		std::vector<std::pair<float, float>> positions = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15),
 			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene2, hallways };
-		SetupEnemy(enemyInfo);
+		SetupEnemy(enemyInfo, positions);
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
+		std::vector<std::pair<float, float>> positions2 = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
+		SetupEnemy(enemyInfo2, positions2);
+
 		//Gameobject for the fps
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
@@ -1237,10 +1324,16 @@ void load()
 			lambda(players, coopScene3.GetStartUpInfo().PlayerPositions);
 			});
 		coopScene3.SetStartUpFunctor(&functor, startUpInfo);
-		SetupTunnels(hallways);
-		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), { 160,160 },
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene3, hallways };
-		SetupEnemy(enemyInfo);
+		SetupTunnels(hallways,1);
+		std::vector<std::pair<float, float>> positions = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
+		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15),
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene2, hallways };
+		SetupEnemy(enemyInfo, positions);
+		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
+		std::vector<std::pair<float, float>> positions2 = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
+		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
@@ -1304,27 +1397,7 @@ void load()
 			}
 			});
 		pvpScene.SetStartUpFunctor(&functor, startUpInfo);
-
-		//Player setup
-		/*PlayerInfo playerInfo1{"DigDug_General_Sprites.png", SDL_Rect(16, 15, 14, 15), {SDL_Rect(0, 15, 14, 15), SDL_Rect(16, 15, 14, 15)},
-			{81,81}, "PvP Player 1", pvpScene, hallways, playerStatsDisplayGo.get(), gameMaster.get()};
-		ControllerInfo controllerInfo1{ "KeyboardPlayer1",input};
-		ScoreInfo scoreInfo1{ smallFont, ScoreBoardParentGo };
-		SetupPlayer(playerInfo1, controllerInfo1, scoreInfo1);*/
-		//int pos[2]{ 81,81 };
-		//SetupPlayer("DigDug_General_Sprites.png", SDL_Rect(1, 0, 14, 15), pos, "Player 1", true, input, scene, smallFont, ScoreBoardParentGo, hallways);
-		//int pos2[2]{ 161,81 };
-		/*FygarPlayerInfo fygarPlayerInfo{"DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15), {SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15)},
-			{ 161,81 }, "PvP Player 2", pvpScene, hallways, playerStatsDisplayGo.get(), {SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
-
-		ControllerInfo controllerInfo2{ "GamepadPlayer1",input};
-		ScoreInfo scoreInfo2{ smallFont, ScoreBoardParentGo };
-		SetupFygarPlayer(fygarPlayerInfo, controllerInfo2, scoreInfo2);*/
-		SetupTunnels(hallways);
-		/*EnemyInfo enemyInfo{"DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), {160,160},
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, pvpScene, hallways };
-		SetupEnemy(enemyInfo);*/
-		//Gameobject for the fps
+		SetupTunnels(hallways,0);
 		auto go = std::make_unique<dae::GameObject>();
 		go->AddComponent<dae::TextComponent>(*go.get(), "here", smallFont);
 		go->AddComponent<dae::FPSComponent>(*go.get());

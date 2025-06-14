@@ -179,8 +179,10 @@
     <ClCompile Include="RotatorComponent.cpp" />
     <ClCompile Include="ScoreObserver.cpp" />
     <ClCompile Include="SelectModeCommand.cpp" />
+    <ClCompile Include="SkipCommand.cpp" />
     <ClCompile Include="States.cpp" />
     <ClCompile Include="Suicide.cpp" />
+    <ClCompile Include="ToggleSoundCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DigDugAttackCommand.h" />
@@ -211,8 +213,10 @@
     <ClInclude Include="RotatorComponent.h" />
     <ClInclude Include="ScoreObserver.h" />
     <ClInclude Include="SelectModeCommand.h" />
+    <ClInclude Include="SkipCommand.h" />
     <ClInclude Include="States.h" />
     <ClInclude Include="Suicide.h" />
+    <ClInclude Include="ToggleSoundCommand.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Data\DigDug_SoundEffects\03 Stage Finale.mp3" />

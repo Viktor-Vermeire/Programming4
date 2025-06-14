@@ -106,6 +106,7 @@ dae::KeyInfo dae::KeyboardComponent::GetKeyLocation(int x, int y)
 	return m_KeyLocations[y][x];
 }
 
+//Made with help from Lechat (chat.mistral.ai) due to issues with reinterpret_cast which was our first idea
 std::unique_ptr<const char[]> dae::KeyboardComponent::IntToBytes(int value)
 {
 	auto bytes = std::make_unique<char[]>(sizeof(int));
@@ -152,7 +153,7 @@ void dae::KeyboardComponent::SaveScore()
 
 	outFile.close();
 }
-
+//Credit to Niels Vanermen for walking me through this 
 void dae::KeyboardComponent::ReadHighScoreBinary()
 {
 	std::ifstream inFile(m_FileName, std::ios::binary);

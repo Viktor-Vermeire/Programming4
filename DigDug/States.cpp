@@ -67,6 +67,8 @@ void dae::FloatingToPlayer::Execute(GameObject* gameObject)
 		auto result = fmodf(m_TimeInState, m_TimePerFrame);
 		auto castedtimeperframe = ((m_TimeInState - (result)) / m_TimePerFrame);
 		auto check = static_cast<_int64>(castedtimeperframe);
+		if (check == static_cast<_int64>(m_AnimationLocations.size()))
+			check = 0;
 		comp->SetBox(m_AnimationLocations[check]);
 	}
 
@@ -118,6 +120,8 @@ void dae::FloatingToGrid::Execute(GameObject* gameObject)
 		auto result = fmodf(m_TimeInState, m_TimePerFrame);
 		auto castedtimeperframe = ((m_TimeInState - (result)) / m_TimePerFrame);
 		auto check = static_cast<_int64>(castedtimeperframe);
+		if (check == static_cast<_int64>(m_AnimationLocations.size()))
+			check = 0;
 		comp->SetBox(m_AnimationLocations[check]);
 	}
 	//Movement Part

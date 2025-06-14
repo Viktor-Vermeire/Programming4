@@ -24,7 +24,9 @@ namespace dae {
 		void AddSongs(std::vector<const char*> songs);
 		void PlayEffect(const unsigned short id, const float volume);
 		void PlayMusic(const unsigned short id, const float volume);
+		void ToggleMute();
 	private:
+		bool m_Muted;
 		void HandleSoundQueue();
 		std::mutex mtx;
 		std::vector<Mix_Chunk*> m_Effects;
@@ -57,6 +59,11 @@ namespace dae {
 		m_SDLSoundSystemImpl->PlayMusic(id, volume);
 	}
 
+	void SDLSoundSystem::ToggleMute()
+	{
+		m_SDLSoundSystemImpl->ToggleMute();
+	}
+
 	void SDLSoundSystemImpl::PlayEffect(const unsigned short id, const float volume)
 	{
 		m_SoundQueue.push(SoundInfo{id,volume, SoundType::EFFECT});
@@ -69,6 +76,19 @@ namespace dae {
 		m_SoundQueue.push(SoundInfo{ id,volume, SoundType::MUSIC });
 		std::lock_guard<std::mutex> lock(mtx);
 		m_CondiVar.notify_all();
+	}
+
+	void SDLSoundSystemImpl::ToggleMute()
+	{
+		if (m_Muted) {
+			Mix_Volume(-1, MIX_MAX_VOLUME);
+			Mix_VolumeMusic(MIX_MAX_VOLUME);
+		}
+		else {
+			Mix_Volume(-1, 0);
+			Mix_VolumeMusic(0);
+		}
+		m_Muted = !m_Muted;
 	}
 
 	void SDLSoundSystemImpl::HandleSoundQueue()
@@ -105,6 +125,7 @@ namespace dae {
 	SDLSoundSystemImpl::SDLSoundSystemImpl(const std::filesystem::path& dataPath): m_DataPath{dataPath}
 	{
 		m_SoundThread = std::jthread(&SDLSoundSystemImpl::HandleSoundQueue, this);
+		m_Muted = false;
 	}
 
 	void SDLSoundSystemImpl::AddEffects(std::vector<const char*> effects)

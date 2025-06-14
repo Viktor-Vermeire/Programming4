@@ -6,16 +6,21 @@
 #include "SceneManager.h"
 #include "IObserver.h"
 #include "Scene.h"
+#include "Minigin.h"
 dae::GameMasterComponent::GameMasterComponent(GameObject& gameobject, std::string succesScene, std::string loseScene): 
 	BaseComponent(gameobject), m_SuccesScene{succesScene}, m_LoseScene{loseScene}
 {
 	m_EnemyPresenceObserver = std::make_unique<EnemyPresenceObserver>();
 	m_PlayerPresenceObserver = std::make_unique<PlayerPresenceObserver>();
+	m_StartUpCooldown = 2;
+	m_RemainingCooldown = m_StartUpCooldown;
 }
 
 void dae::GameMasterComponent::Update()
 {
-	if (m_EnemyPresenceObserver->GetLivingEnemies().empty()) {
+	if (m_RemainingCooldown > 0) 
+		m_RemainingCooldown -= Minigin::DELTATIME;
+	if (m_EnemyPresenceObserver->GetLivingEnemies().empty() || m_ToBeSkipped) {
 		SceneManager::GetInstance().SetToSwitchScene(*SceneManager::GetInstance().GetScene(m_SuccesScene));
 		return;
 	}
@@ -39,4 +44,10 @@ void dae::GameMasterComponent::PrepGameMaster(Scene& scene)
 {
 	m_EnemyPresenceObserver->PrepObserver(*GetOwner(), SCORE, scene);
 	m_PlayerPresenceObserver->PrepObserver(*GetOwner(), DEATH, scene);
+}
+
+void dae::GameMasterComponent::SetToBeSkipped(bool value)
+{
+	if (m_RemainingCooldown > 0) return;
+	m_ToBeSkipped = value;
 }

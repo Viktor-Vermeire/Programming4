@@ -13,6 +13,7 @@ namespace dae {
 		void PlayMusic(const unsigned short, const float) override {};
 		void AddEffects(std::vector<const char*>) override{};
 		void AddSongs(std::vector<const char*>) override {};
+		void ToggleMute() override {};
 	};
 	class ServiceLocator final
 	{
