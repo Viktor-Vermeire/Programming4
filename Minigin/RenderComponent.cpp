@@ -26,12 +26,12 @@ SDL_Rect dae::RenderComponent::GetBox()
 	return m_Box;
 }
 
-void dae::RenderComponent::SetBox(SDL_Rect box)
+void dae::RenderComponent::SetBox(const SDL_Rect& box)
 {
 	m_Box = box;
 }
 
-void dae::RenderComponent::SetDstBox(SDL_Rect box)
+void dae::RenderComponent::SetDstBox(const SDL_Rect& box)
 {
 	m_DstBox = box;
 }

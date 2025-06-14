@@ -7,12 +7,12 @@
 #include "EnemyComponent.h"
 #include "HealthComponent.h"
 
-dae::PlayerComponent::PlayerComponent(GameObject& gameObject,std::string name) :
+dae::PlayerComponent::PlayerComponent(GameObject& gameObject,const std::string& name) :
 	BaseComponent(gameObject), m_Name{ name }, m_Score{0}
 {
 }
 
-std::string dae::PlayerComponent::GetName()
+std::string& dae::PlayerComponent::GetName()
 {
 	return m_Name;
 }

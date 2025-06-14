@@ -1,46 +1,12 @@
 #include <SDL.h>
 #include "SceneManager.h"
 #include "InputManager.h"
-#include <backends/imgui_impl_sdl2.h>
 #include "Gamepad.h"
-#include "AnimationComponent.h"
 #include "GameObject.h"
 #include "iostream"
 #include "memory"
 #include "map"
 #include "Command.h"
-
-/*bool dae::InputManager::ProcessInput()
-{
-	const Uint8* pStates = SDL_GetKeyboardState(nullptr);
-	SDL_Event e;
-	
-
-	for (int actorLooper{ 0 }; actorLooper < m_GameActors.size(); ++actorLooper) {
-		for (int commandLooper{ 0 }; commandLooper < m_Commands.size(); ++commandLooper) {
-			if (m_GamePads.at(actorLooper)->IsUsed() != m_Commands.at(commandLooper)->IsUsingGamepad())
-				continue;
-			if (m_GamePads.at(actorLooper)->IsUsed()) {
-				m_GamePads.at(actorLooper)->Update();
-				if (m_GamePads.at(actorLooper)->IsPressed(m_Commands.at(commandLooper)->GetInputValue())) {
-					m_Commands.at(commandLooper)->execute(*m_GameActors.at(actorLooper));
-				}
-			}
-			else {
-				if (pStates[m_Commands.at(commandLooper)->GetInputValue()]) {
-					m_Commands.at(commandLooper)->execute(*m_GameActors.at(actorLooper));
-				}
-				ImGui_ImplSDL2_ProcessEvent(&e);
-			}
-		}
-		while (SDL_PollEvent(&e)) {
-			if (e.type == SDL_QUIT) {
-				return false;
-			}
-		}
-	}
-		return true;
-}*/
 
 bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad, std::vector<Command*> commands)
 {
@@ -62,7 +28,6 @@ bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad,
 			if (pStates[commands.at(commandLooper)->GetInputValue()]) {
 			commands.at(commandLooper)->execute(*player);
 			}
-			ImGui_ImplSDL2_ProcessEvent(&e);
 		}
 	}
 	while (SDL_PollEvent(&e)) {
@@ -74,21 +39,21 @@ bool dae::InputManager::ProcessPlayerInput(GameObject* player, Gamepad* gamepad,
 }
 
 
-void dae::InputManager::AddGamepad(std::string key, std::unique_ptr<Gamepad> gamepad)
+void dae::InputManager::AddGamepad(const std::string& key, std::unique_ptr<Gamepad> gamepad)
 {
 	m_GamePads[key] = (std::move(gamepad));
 }
 
-dae::Gamepad* dae::InputManager::GetGamePad(std::string key) {
+dae::Gamepad* dae::InputManager::GetGamePad(const std::string& key) {
 	return m_GamePads[key].get();
 }
 
-dae::GameObject* dae::InputManager::GetGameActor(std::string key)
+dae::GameObject* dae::InputManager::GetGameActor(const std::string& key)
 {
 	return m_GameActors[key].get();
 }
 
-void dae::InputManager::AddGameActor(std::string key,std::unique_ptr<GameObject> gameActor)
+void dae::InputManager::AddGameActor(const std::string& key,std::unique_ptr<GameObject> gameActor)
 {
 	m_GameActors[key] = (std::move(gameActor));
 }
@@ -98,7 +63,7 @@ int dae::InputManager::GetGameActorSize() {
 }
 
 
-dae::Command* dae::InputManager::GetCommand(std::string key)
+dae::Command* dae::InputManager::GetCommand(const std::string& key)
 {
 	return m_Commands[key].get();
 }

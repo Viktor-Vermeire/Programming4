@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "KeyboardComponent.h"
 
-dae::KeyboardMoveCommand::KeyboardMoveCommand(unsigned int inputValue, bool usingGamepad, std::pair<float, float> change) : Command(inputValue, usingGamepad),
+dae::KeyboardMoveCommand::KeyboardMoveCommand(unsigned int inputValue, bool usingGamepad,const std::pair<float, float>& change) : Command(inputValue, usingGamepad),
 m_Change{change}
 {
 }

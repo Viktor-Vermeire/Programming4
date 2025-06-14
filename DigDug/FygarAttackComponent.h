@@ -8,7 +8,7 @@ namespace dae {
     class GameObject;
     class FygarAttackComponent : public BaseComponent{
     public:
-        FygarAttackComponent(GameObject& gameObject, std::vector<SDL_Rect> flameRects, std::string texturePath, float maxFlameTime);
+        FygarAttackComponent(GameObject& gameObject, const std::vector<SDL_Rect>& flameRects, const std::string& texturePath, float maxFlameTime);
         bool IsActive();
         void SetActive(bool active);
         void Update() override;

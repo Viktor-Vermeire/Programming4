@@ -17,7 +17,7 @@ namespace dae
 		void SetActiveScene(Scene& scene);
 		void SetToSwitchScene(Scene& scene);
 		Scene* GetActiveScene();
-		Scene* GetScene(std::string name);
+		Scene* GetScene(const std::string& name);
 	private:
 		friend class Singleton<SceneManager>;
 		SceneManager() = default;

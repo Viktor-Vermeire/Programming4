@@ -11,7 +11,7 @@
 #include "PlayerComponent.h"
 #include "ServiceLocator.h"
 
-dae::DigDugAttackComponent::DigDugAttackComponent(GameObject& go, SDL_Rect maxAttackRect, std::string texturePath, float maxGrowTime, float pumpCooldown)
+dae::DigDugAttackComponent::DigDugAttackComponent(GameObject& go, const SDL_Rect& maxAttackRect,const std::string& texturePath, float maxGrowTime, float pumpCooldown)
 	: BaseComponent(go), 
 m_MaxAttackRect{maxAttackRect}, m_MaxGrowTime{maxGrowTime}, m_PumpCooldown{pumpCooldown}
 {
@@ -59,11 +59,21 @@ void dae::DigDugAttackComponent::Pump()
 				m_Connected = false;
 				m_Active = false;
 				m_TimeGrowing = 0.f;
-				if (score)
-					score->SetScore(score->GetScore() + comp->GetValue());
+				if (score) {
+					int width = 0;
+					int height = 0;
+					SDL_GetWindowSize(dae::Renderer::GetInstance().GetSDLWindow(), &width, &height);
+					auto y = m_TetheredEnemy->GetWorldTransform().GetPosition().y;
+					auto multiplier = height / 5;
+					auto rest = std::fmod(y, multiplier);
+					auto result = (y - rest) / multiplier;
+					if (result == 0) {
+						result = 1;
+					}
+					score->SetScore(score->GetScore() + static_cast<int>(comp->GetValue()* (result+1)));
+				}
 			}
 		}
-		std::cout << "Pumped \n";
 	}
 }
 

@@ -31,7 +31,6 @@ void dae::PlayerPresenceObserver::PrepObserver(GameObject&, Event event, Scene& 
 			auto health = go->GetComponent<HealthComponent>();
 			if (health) {
 				if (health->GetLives() > 0)
-					std::cout << "lives: " << health->GetLives();
 					m_LivingPlayers.emplace_back(go);
 			}
 

@@ -11,7 +11,7 @@ namespace dae {
     class GameMasterComponent : public BaseComponent
     {
     public:
-        GameMasterComponent(GameObject& gameobject, std::string succesScene, std::string loseScene);
+        GameMasterComponent(GameObject& gameobject, const std::string& succesScene,const std::string& loseScene);
         void Update() override;
         IObserver* GetPlayerPresenceObserver();
         IObserver* GetEnemyPresenceObserver();

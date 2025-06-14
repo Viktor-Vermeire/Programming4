@@ -13,13 +13,13 @@ namespace dae {
 	public:
 		KeyboardComponent(GameObject& gameObject, float inputCoolDown);
 		void Update() override;
-		void AddKeyLocation(KeyInfo location);
-		void AddKeyLocation(int y, KeyInfo location);
-		void ChangeHighlightedLetter(std::pair<float, float> change);
-		void SetHighLightSize(std::pair<int, int> size);
+		void AddKeyLocation(const KeyInfo& location);
+		void AddKeyLocation(int y, const KeyInfo& location);
+		void ChangeHighlightedLetter(const std::pair<float, float>& change);
+		void SetHighLightSize(const std::pair<int, int>& size);
 		void ConfirmLetter();
 		void SaveScore();
-		void SetFileName(std::string fileName);
+		void SetFileName(const std::string& fileName);
 		void Render() override;
 		KeyInfo GetKeyLocation(int x, int y);
 	private:

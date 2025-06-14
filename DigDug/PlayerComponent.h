@@ -7,8 +7,8 @@ namespace dae {
         public BaseComponent, public ISubject
     {
     public:
-        PlayerComponent(GameObject& gameobject,std::string name);
-        std::string GetName();
+        PlayerComponent(GameObject& gameobject,const std::string& name);
+        std::string& GetName();
         void Update() override;
         int GetScore();
         void SetScore(int score);

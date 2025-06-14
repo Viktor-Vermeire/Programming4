@@ -53,22 +53,22 @@ void dae::FiniteStateMachineComponent::SetCurrentState(State* state)
 	m_CurrentState = state;
 }
 
-dae::State* dae::FiniteStateMachineComponent::GetState(std::string name)
+dae::State* dae::FiniteStateMachineComponent::GetState(const std::string& name)
 {
 	return m_States[name].get();
 }
 
-dae::Condition* dae::FiniteStateMachineComponent::GetCondition(std::string name)
+dae::Condition* dae::FiniteStateMachineComponent::GetCondition(const std::string& name)
 {
 	return m_Conditions[name].get();
 }
 
-void dae::FiniteStateMachineComponent::RemoveState(std::string name)
+void dae::FiniteStateMachineComponent::RemoveState(const std::string& name)
 {
 	m_States.erase(name);
 }
 
-void dae::FiniteStateMachineComponent::RemoveCondition(std::string name)
+void dae::FiniteStateMachineComponent::RemoveCondition(const std::string& name)
 {
 	m_Conditions.erase(name);
 }

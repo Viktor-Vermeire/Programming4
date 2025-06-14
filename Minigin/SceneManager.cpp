@@ -43,7 +43,7 @@ dae::Scene* dae::SceneManager::GetActiveScene()
 	return m_ActiveScene;
 }
 
-dae::Scene* dae::SceneManager::GetScene(std::string name)
+dae::Scene* dae::SceneManager::GetScene(const std::string& name)
 {
 	auto scene = std::find_if(m_scenes.begin(), m_scenes.end(), [&name](const std::shared_ptr<Scene> scene) {
 		return scene->GetName() == name;});

@@ -1,7 +1,6 @@
 #include "MovementComponent.h"
 #include "Minigin.h"
 #include "GameObject.h"
-#include "AnimationComponent.h"
 #include "iostream"
 #include "HallwaysComponent.h"
 #include <glm.hpp>

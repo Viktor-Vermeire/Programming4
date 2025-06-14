@@ -10,7 +10,7 @@ namespace dae {
         FloatingComponent(GameObject& gameObject, float movementSpeed);
         void MoveTarget();
         void MoveToGrid();
-        void SetGridTarget(glm::vec3 gridTarget);
+        void SetGridTarget(const glm::vec3& gridTarget);
         void SetPlayerTarget(GameObject* target);
         void SetInGrid(bool value);
         bool InGrid();

@@ -26,7 +26,7 @@ void dae::Attacking::Exit(GameObject*)
 {
 }
 
-dae::FloatingToPlayer::FloatingToPlayer(std::vector<SDL_Rect> animationLocations, float timePerFrame) :
+dae::FloatingToPlayer::FloatingToPlayer(const std::vector<SDL_Rect>& animationLocations, float timePerFrame) :
 	m_AnimationLocations{ animationLocations }, m_TimePerFrame{ timePerFrame }
 {
 }
@@ -89,7 +89,7 @@ float dae::FloatingToPlayer::GetTimeInState()
 	return m_TimeInState;
 }
 
-dae::FloatingToGrid::FloatingToGrid(std::vector<SDL_Rect> animationLocations, float timePerFrame) :
+dae::FloatingToGrid::FloatingToGrid(const std::vector<SDL_Rect>& animationLocations, float timePerFrame) :
 	m_AnimationLocations{ animationLocations }, m_TimePerFrame{ timePerFrame }
 {
 }
@@ -177,7 +177,7 @@ void dae::Idle::Exit(GameObject*)
 {
 }
 
-dae::Running::Running(std::vector<SDL_Rect> animationLocations, float timePerFrame): 
+dae::Running::Running(const std::vector<SDL_Rect>& animationLocations, float timePerFrame): 
 	m_AnimationLocations{animationLocations}, m_TimePerFrame{timePerFrame}
 {
 	m_TimeInState = 0;

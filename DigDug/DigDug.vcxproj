@@ -154,7 +154,6 @@
     <ClCompile Include="DigDugAttackCommand.cpp" />
     <ClCompile Include="DigDugAttackComponent.cpp" />
     <ClCompile Include="Conditions.cpp" />
-    <ClCompile Include="DiggingComponent.cpp" />
     <ClCompile Include="EnemyComponent.cpp" />
     <ClCompile Include="EnemyPresenceObserver.cpp" />
     <ClCompile Include="FloatingComponent.cpp" />
@@ -175,7 +174,6 @@
     <ClCompile Include="PlayerPresenceObserver.cpp" />
     <ClCompile Include="PlaySound.cpp" />
     <ClCompile Include="Pump.cpp" />
-    <ClCompile Include="RockComponent.cpp" />
     <ClCompile Include="RotatorComponent.cpp" />
     <ClCompile Include="ScoreObserver.cpp" />
     <ClCompile Include="SelectModeCommand.cpp" />
@@ -188,7 +186,6 @@
     <ClInclude Include="DigDugAttackCommand.h" />
     <ClInclude Include="DigDugAttackComponent.h" />
     <ClInclude Include="Conditions.h" />
-    <ClInclude Include="DiggingComponent.h" />
     <ClInclude Include="EnemyComponent.h" />
     <ClInclude Include="EnemyPresenceObserver.h" />
     <ClInclude Include="FloatingComponent.h" />
@@ -206,10 +203,8 @@
     <ClInclude Include="PlayerComponent.h" />
     <ClInclude Include="PlayerInfoComponent.h" />
     <ClInclude Include="PlayerPresenceObserver.h" />
-    <ClInclude Include="PlayerState.h" />
     <ClInclude Include="PlaySound.h" />
     <ClInclude Include="Pump.h" />
-    <ClInclude Include="RockComponent.h" />
     <ClInclude Include="RotatorComponent.h" />
     <ClInclude Include="ScoreObserver.h" />
     <ClInclude Include="SelectModeCommand.h" />

@@ -10,8 +10,8 @@
 #include "HealthComponent.h"
 #include "Renderer.h"
 
-dae::FygarAttackComponent::FygarAttackComponent(GameObject& gameObject, std::vector<SDL_Rect> flameRects, 
-	std::string texturePath, float maxFlameTime): BaseComponent(gameObject), m_FlameRects{flameRects}, m_MaxFlameTime{maxFlameTime}
+dae::FygarAttackComponent::FygarAttackComponent(GameObject& gameObject,const std::vector<SDL_Rect>& flameRects, 
+	const std::string& texturePath, float maxFlameTime): BaseComponent(gameObject), m_FlameRects{flameRects}, m_MaxFlameTime{maxFlameTime}
 {
 	m_Active = false;
 	m_CurrentFlameRect = {};

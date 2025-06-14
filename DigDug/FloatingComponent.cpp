@@ -33,7 +33,7 @@ void dae::FloatingComponent::MoveToGrid()
 	GetOwner()->SetPosition(localPos.x, localPos.y);
 }
 
-void dae::FloatingComponent::SetGridTarget(glm::vec3 gridTarget)
+void dae::FloatingComponent::SetGridTarget(const glm::vec3& gridTarget)
 {
 	m_GridTarget = gridTarget;
 }

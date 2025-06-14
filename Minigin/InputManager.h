@@ -14,18 +14,18 @@ namespace dae
 	public:
 		//bool ProcessInput();
 		bool ProcessPlayerInput(GameObject* player, Gamepad* gamepad, std::vector<Command*> commands);
-		void AddGamepad(std::string key, std::unique_ptr<Gamepad> gamepad);
-		void AddGameActor(std::string key,std::unique_ptr<GameObject> gameActor);
+		void AddGamepad(const std::string& key, std::unique_ptr<Gamepad> gamepad);
+		void AddGameActor(const std::string& key,std::unique_ptr<GameObject> gameActor);
 		//Command* GetCommand(std::string key);
 		int GetGameActorSize();
-		Command* GetCommand(std::string key);
-		Gamepad* GetGamePad(std::string key);
-		GameObject* GetGameActor(std::string key);
+		Command* GetCommand(const std::string& key);
+		Gamepad* GetGamePad(const std::string& key);
+		GameObject* GetGameActor(const std::string& key);
 
 		bool CheckExit();
 
 		template <typename CommandType, typename... Args>
-		void AddCommand(std::string key,Args&&... args) {
+		void AddCommand(const std::string& key,Args&&... args) {
 			static_assert(std::is_base_of<Command, CommandType>::value, "CommandType must be derived from Command");
 			//m_Commands.push_back(std::make_unique<CommandType>(std::forward<Args>(args)...));
 			m_Commands[key] = (std::make_unique<CommandType>(std::forward<Args>(args)...));

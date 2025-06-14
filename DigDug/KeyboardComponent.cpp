@@ -43,22 +43,21 @@ void dae::KeyboardComponent::Update()
 	}
 }
 
-void dae::KeyboardComponent::AddKeyLocation(KeyInfo location)
+void dae::KeyboardComponent::AddKeyLocation(const KeyInfo& location)
 {
 	std::vector< KeyInfo> test = { location };
 	m_KeyLocations.emplace_back(test);
 }
 
-void dae::KeyboardComponent::AddKeyLocation(int y, KeyInfo location)
+void dae::KeyboardComponent::AddKeyLocation(int y, const KeyInfo& location)
 {
 	m_KeyLocations[y].emplace_back(location);
 }
 
-void dae::KeyboardComponent::ChangeHighlightedLetter(std::pair<float, float> change)
+void dae::KeyboardComponent::ChangeHighlightedLetter(const std::pair<float, float>& change)
 {
 	if (m_CooldownTimer > 0) return;
 	m_CooldownTimer = m_InputCooldown;
-	std::cout << "key: " << m_HighlightedLetter.first << "y: " << m_HighlightedLetter.second << "\n";
 	m_HighlightedLetter.second += change.second;
 	if (m_HighlightedLetter.second >= m_KeyLocations.size())
 		m_HighlightedLetter.second = 0;
@@ -71,7 +70,7 @@ void dae::KeyboardComponent::ChangeHighlightedLetter(std::pair<float, float> cha
 		m_HighlightedLetter.first = static_cast<float>(m_KeyLocations[static_cast<int>(m_HighlightedLetter.second)].size()) - 1.f;
 }
 
-void dae::KeyboardComponent::SetHighLightSize(std::pair<int, int> size)
+void dae::KeyboardComponent::SetHighLightSize(const std::pair<int, int>& size)
 {
 	m_HighlightSize = size;
 }
@@ -88,7 +87,7 @@ void dae::KeyboardComponent::ConfirmLetter()
 	}
 }
 
-void dae::KeyboardComponent::SetFileName(std::string fileName)
+void dae::KeyboardComponent::SetFileName(const std::string& fileName)
 {
 	m_FileName = fileName;
 }

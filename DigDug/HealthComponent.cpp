@@ -60,7 +60,6 @@ void dae::HealthComponent::Die()
 	if (m_CooldownTimer <= 0) {
 		m_CooldownTimer = m_DamageCooldown;
 		--m_Lives;
-		std::cout << "hiyo Silver";
 		m_Health = 1;
 		if (m_Lives <= 0) {
 			GetOwner()->m_Active = false;

@@ -25,11 +25,8 @@
 #include "Suicide.h"
 #include "Pickup.h"
 #include "PlaySound.h"
-#include "DiggingComponent.h"
-#include "RockComponent.h"
 #include "HallwaysComponent.h"
 #include "ServiceLocator.h"
-#include "AnimationComponent.h"
 #include "FiniteStateMachineComponent.h"
 #include "HandleInput.h"
 #include "States.h"
@@ -112,28 +109,6 @@ void InitializeCommands(dae::InputManager& input)
 	input.AddCommand<dae::PlaySound>(SDL_SCANCODE_F, false, 0);
 	input.AddCommand<dae::PlaySound>(4096, true, 0);*/
 }
-struct PlayerInfo {
-	std::string texturePath;
-	SDL_Rect textureSrcRect;
-	std::vector<SDL_Rect> runningAnimLocations;
-	int startPos[2];
-	std::string name;
-	dae::Scene& scene; 
-	dae::GameObject* hallways;
-	dae::GameObject* playerStatDisplay;
-	dae::GameObject* gameMaster;
-};
-struct FygarPlayerInfo {
-	std::string texturePath;
-	SDL_Rect textureSrcRect;
-	std::vector<SDL_Rect> runningAnimLocations;
-	int startPos[2];
-	std::string name;
-	dae::Scene& scene;
-	dae::GameObject* hallways;
-	dae::GameObject* playerStatDisplay;
-	std::vector<SDL_Rect> fygarFlameRects;
-};
 struct PlayerInfoTemp {
 	std::string texturePath;
 	SDL_Rect textureSrcRect;
@@ -162,6 +137,7 @@ struct EnemyInfo {
 	SDL_Rect textureSrcRect;
 	std::vector<SDL_Rect> runningAnimLocations;
 	std::vector<SDL_Rect> floatingAnimLocations;
+	int scoreValue;
 	dae::Scene& scene;
 	dae::GameObject* hallways;
 	std::vector<SDL_Rect> fygarFlameRects;
@@ -338,7 +314,7 @@ void SetupGeneralPlayer(const PlayerInfoTemp& playerInfo, const ControllerInfo& 
 
 
 	player->AddComponent<dae::PlayerComponent>(*player.get(), playerInfo.name);
-	player->AddComponent<dae::HealthComponent>(*player.get(), 1, 8, 1.f);
+	player->AddComponent<dae::HealthComponent>(*player.get(), 1, 4, 1.f);
 
 	controllerInfo.input.AddGameActor(playerInfo.name, std::move(player));
 }
@@ -592,7 +568,7 @@ void SetupEnemy(EnemyInfo enemyInfo, std::vector<std::pair<float, float>> locati
 
 
 		go->AddComponent<dae::HealthComponent>(*go.get(), 1, 8, 1.f);
-		go->AddComponent<dae::EnemyComponent>(*go.get(), 3, 100, 3.f);
+		go->AddComponent<dae::EnemyComponent>(*go.get(), 3, enemyInfo.scoreValue, 3.f);
 		//auto healthComp = go->GetComponent<dae::HealthComponent>();
 		//go->AddComponent<dae::DiggingComponent>(*go.get(), hallways->GetComponent<dae::HallwaysComponent>());
 		//go->SetParent(nullptr); //This was a test for resetting a gameobject to the root
@@ -767,8 +743,6 @@ dae::GameObject* SetupLevelAndReturnHallwaysObject(dae::Scene& scene, bool wantH
 				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 23, 8, 8));
 			else
 				GroundObject->GetComponent<dae::RenderComponent>()->SetTexture("DigDug_Tiles_Logos_Text.png", SDL_Rect(64, 32, 8, 8));
-			
-			GroundObject->AddComponent<dae::RockComponent>(*GroundObject.get());
 			GroundObject->SetPosition(static_cast<float>(colPos), static_cast<float>(rowPos));
 			scene.Add(std::move(GroundObject));
 		}
@@ -953,12 +927,12 @@ void load()
 		
 		SetupTunnels(hallways, 3);
 		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene, hallways };
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},100, singleScene, hallways };
 		std::vector<std::pair<float, float>> positions = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
 		SetupEnemy(enemyInfo, positions);
 		std::vector<std::pair<float, float>> positions2 = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
 		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
-			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene, hallways, 
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},200, singleScene, hallways, 
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)}};
 		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
@@ -1025,12 +999,12 @@ void load()
 
 		SetupTunnels(hallways,1);
 		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene2, hallways };
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},100, singleScene2, hallways };
 		std::vector<std::pair<float, float>> positions = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
 		SetupEnemy(enemyInfo, positions);
 		std::vector<std::pair<float, float>> positions2 = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
 		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
-			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene2, hallways,
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},200, singleScene2, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
 		SetupEnemy(enemyInfo2, positions2);
 		//Gameobject for the fps
@@ -1097,11 +1071,11 @@ void load()
 
 		SetupTunnels(hallways,0);
 		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 15, 14),
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways };
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},100, singleScene3, hallways };
 		std::vector<std::pair<float, float>> positions = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
 		SetupEnemy(enemyInfo, positions);
 		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
-			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},200, singleScene3, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
 		std::vector<std::pair<float, float>> positions2 = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
 		SetupEnemy(enemyInfo2, positions2);
@@ -1173,11 +1147,11 @@ void load()
 		coopScene.SetStartUpFunctor(&functor, startUpInfo);
 		SetupTunnels(hallways,1);
 		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15), 
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene, hallways };
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},100, coopScene, hallways };
 		std::vector<std::pair<float, float>> positions = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
 		SetupEnemy(enemyInfo, positions);
 		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
-			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},200, coopScene, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
 		std::vector<std::pair<float, float>> positions2 = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
 		SetupEnemy(enemyInfo2, positions2);
@@ -1250,10 +1224,10 @@ void load()
 		SetupTunnels(hallways,1);
 		std::vector<std::pair<float, float>> positions = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
 		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15),
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene2, hallways };
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},100, coopScene2, hallways };
 		SetupEnemy(enemyInfo, positions);
 		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
-			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},200, singleScene3, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
 		std::vector<std::pair<float, float>> positions2 = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
 		SetupEnemy(enemyInfo2, positions2);
@@ -1327,10 +1301,10 @@ void load()
 		SetupTunnels(hallways,1);
 		std::vector<std::pair<float, float>> positions = { {2.f,22.f},{9.f,20.f},{8.f,6.f},{25.f,13.f},{17.f,14.f},{11.f,8.f} };
 		EnemyInfo enemyInfo{ "DigDug_General_Sprites.png", SDL_Rect(0, 145, 14, 15),
-			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, coopScene2, hallways };
+			{ SDL_Rect(0, 145, 15, 14), SDL_Rect(16, 145, 15, 14) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},100, coopScene2, hallways };
 		SetupEnemy(enemyInfo, positions);
 		EnemyInfo enemyInfo2{ "DigDug_General_Sprites.png", SDL_Rect(0, 241, 14, 15),
-			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)}, singleScene3, hallways,
+			{ SDL_Rect(0, 241, 14, 15), SDL_Rect(16, 241, 14, 15) },{SDL_Rect(98, 243, 13, 10) , SDL_Rect(114, 243, 13, 11)},200, singleScene3, hallways,
 			{SDL_Rect(0,272,16,17), SDL_Rect(16,272,32,17), SDL_Rect(48,272,48,17)} };
 		std::vector<std::pair<float, float>> positions2 = { {5.f,22.f},{9.f,13.f},{23.f,6.f},{15.f,18.f},{2.f,14.f},{17.f,21.f} };
 		SetupEnemy(enemyInfo2, positions2);
@@ -1375,7 +1349,7 @@ void load()
 		pvpScene.Add(std::move(gameMaster));
 		auto hallways = SetupLevelAndReturnHallwaysObject(pvpScene, true);
 
-		dae::StartUpInfo startUpInfo{ {{81.f,81.f}, { 161.f,81.f },} };
+		dae::StartUpInfo startUpInfo{ {{81.f,81.f}, { 145.f,112.f },} };
 		auto functor = std::function([&pvpScene](dae::Scene*) {
 			auto player = dae::InputManager::GetInstance().GetGameActor("CoopPlayer1");
 			auto enemyPlayer = dae::InputManager::GetInstance().GetGameActor("PvPPlayer2");

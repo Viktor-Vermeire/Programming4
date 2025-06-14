@@ -5,7 +5,7 @@ namespace dae {
 	class KeyboardMoveCommand : public Command
 	{
     public:
-        KeyboardMoveCommand(unsigned int inputValue, bool usingGamepad, std::pair<float, float> change);
+        KeyboardMoveCommand(unsigned int inputValue, bool usingGamepad,const std::pair<float, float>& change);
         void execute(GameObject& gameObject);
     private:
         std::pair<float, float> m_Change;

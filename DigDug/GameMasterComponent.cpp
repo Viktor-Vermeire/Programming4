@@ -7,7 +7,7 @@
 #include "IObserver.h"
 #include "Scene.h"
 #include "Minigin.h"
-dae::GameMasterComponent::GameMasterComponent(GameObject& gameobject, std::string succesScene, std::string loseScene): 
+dae::GameMasterComponent::GameMasterComponent(GameObject& gameobject,const std::string& succesScene,const std::string& loseScene): 
 	BaseComponent(gameobject), m_SuccesScene{succesScene}, m_LoseScene{loseScene}
 {
 	m_EnemyPresenceObserver = std::make_unique<EnemyPresenceObserver>();

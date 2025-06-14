@@ -6,7 +6,7 @@ namespace dae {
         public Command
     {
     public:
-        SelectModeCommand(unsigned int inputValue, bool usingGamepad, std::string sceneName, int songIndex);
+        SelectModeCommand(unsigned int inputValue, bool usingGamepad, const std::string& sceneName, int songIndex);
         void execute(GameObject&) override;
     private:
         std::string m_SceneName;

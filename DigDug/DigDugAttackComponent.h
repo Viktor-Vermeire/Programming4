@@ -8,7 +8,7 @@ namespace dae {
         public BaseComponent
     {
     public:
-        DigDugAttackComponent(GameObject& go, SDL_Rect maxAttackRect, std::string texturePath, float maxGrowTime, float pumpCoolDown);
+        DigDugAttackComponent(GameObject& go, const SDL_Rect& maxAttackRect, const std::string& texturePath, float maxGrowTime, float pumpCoolDown);
         bool IsActive();
         void SetActive(bool active);
         void SetGrowing(bool growing);

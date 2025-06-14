@@ -40,6 +40,9 @@
     <Filter Include="Header Files\Observers">
       <UniqueIdentifier>{82346767-33bc-4c9e-877b-e692a1a77445}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Observers">
+      <UniqueIdentifier>{bed8fba6-4960-48e3-914a-3de6100a3ae6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -64,12 +67,6 @@
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="RotatorComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="RockComponent.cpp">
-      <Filter>Source Files\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="DiggingComponent.cpp">
       <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="HallwaysComponent.cpp">
@@ -102,41 +99,41 @@
     <ClCompile Include="Pump.cpp">
       <Filter>Source Files\Commands</Filter>
     </ClCompile>
-    <ClCompile Include="ScoreObserver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="HealthObserver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SelectModeCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FygarAttackComponent.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="EnemyPresenceObserver.cpp">
+      <Filter>Source Files\Observers</Filter>
     </ClCompile>
     <ClCompile Include="FygarAttackCommand.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="FygarAttackComponent.cpp">
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
     <ClCompile Include="GameMasterComponent.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Components</Filter>
     </ClCompile>
-    <ClCompile Include="EnemyPresenceObserver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerPresenceObserver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="KeyboardComponent.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="HealthObserver.cpp">
+      <Filter>Source Files\Observers</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardCommand.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyboardComponent.cpp">
+      <Filter>Source Files\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerPresenceObserver.cpp">
+      <Filter>Source Files\Observers</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreObserver.cpp">
+      <Filter>Source Files\Observers</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectModeCommand.cpp">
+      <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="SkipCommand.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Commands</Filter>
     </ClCompile>
     <ClCompile Include="ToggleSoundCommand.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -159,12 +156,6 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="RotatorComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="RockComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="DiggingComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="HallwaysComponent.h">
@@ -191,9 +182,6 @@
     <ClInclude Include="DigDugAttackComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerState.h">
-      <Filter>Header Files\States</Filter>
-    </ClInclude>
     <ClInclude Include="DigDugAttackCommand.h">
       <Filter>Header Files\Commands</Filter>
     </ClInclude>
@@ -218,23 +206,23 @@
     <ClInclude Include="EnemyPresenceObserver.h">
       <Filter>Header Files\Observers</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerPresenceObserver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="KeyboardComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="KeyboardCommand.h">
       <Filter>Header Files\Commands</Filter>
     </ClInclude>
     <ClInclude Include="FygarAttackCommand.h">
       <Filter>Header Files\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="KeyboardComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerPresenceObserver.h">
+      <Filter>Header Files\Observers</Filter>
+    </ClInclude>
     <ClInclude Include="SkipCommand.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Commands</Filter>
     </ClInclude>
     <ClInclude Include="ToggleSoundCommand.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Commands</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

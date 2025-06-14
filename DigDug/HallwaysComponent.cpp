@@ -41,7 +41,7 @@ void dae::HallwaysComponent::SetTexture(const std::string& filename)
 	m_Texture = ResourceManager::GetInstance().LoadTexture(filename);
 }
 
-void dae::HallwaysComponent::Dig(glm::vec3 fromLocation, glm::vec3 toLocation)
+void dae::HallwaysComponent::Dig(const glm::vec3& fromLocation,const glm::vec3& toLocation)
 {
 	if (fromLocation.x == toLocation.x) {
 		if (fromLocation.y < toLocation.y) {
@@ -62,17 +62,17 @@ void dae::HallwaysComponent::Dig(glm::vec3 fromLocation, glm::vec3 toLocation)
 	
 }
 
-void dae::HallwaysComponent::AddSource(HallwayType type, SDL_Rect source)
+void dae::HallwaysComponent::AddSource(HallwayType type,const SDL_Rect& source)
 {
 	m_Sources.insert(std::pair<HallwayType, SDL_Rect>(type, source));
 }
 
-const dae::HallwaysComponent::HallwayType& dae::HallwaysComponent::GetHallwayType(const glm::vec3 location)
+const dae::HallwaysComponent::HallwayType& dae::HallwaysComponent::GetHallwayType(const glm::vec3& location)
 {
 	return m_Hallways.at(static_cast<int>(std::round(location.y / 16))).at(static_cast<int>(std::round(location.x / 16)));
 }
 
-bool dae::HallwaysComponent::IsValidHallway(const glm::vec3 location)
+bool dae::HallwaysComponent::IsValidHallway(const glm::vec3& location)
 {
 	int x = static_cast<int>(std::round(location.y / 16));
 	int y = static_cast<int>(std::round(location.x / 16));
@@ -84,7 +84,7 @@ bool dae::HallwaysComponent::IsValidHallway(const glm::vec3 location)
 	return m_Hallways[x][y] != SKY;
 }
 
-glm::vec3 dae::HallwaysComponent::GetFreeHallwayLocation(const glm::vec3 location)
+glm::vec3 dae::HallwaysComponent::GetFreeHallwayLocation(const glm::vec3& location)
 {
 	_int64 yindex = static_cast<_int64>(std::round(location.y / 16));
 	_int64 xindex = static_cast<_int64>(std::round(location.x / 16));
@@ -107,7 +107,7 @@ glm::vec3 dae::HallwaysComponent::GetFreeHallwayLocation(const glm::vec3 locatio
 	return glm::vec3();
 }
 
-void dae::HallwaysComponent::SetHallwayType(std::pair<int, int> index, HallwayType desiredType)
+void dae::HallwaysComponent::SetHallwayType(const std::pair<int, int>& index, HallwayType desiredType)
 {
 	m_Hallways.at(index.first).at(index.second) = desiredType;
 }
@@ -135,7 +135,7 @@ void dae::HallwaysComponent::Render()
 	SDL_SetTextureAlphaMod(m_Texture->GetSDLTexture(), opacity);
 }
 
-void dae::HallwaysComponent::DigRight(const glm::vec3 fromLocation, const glm::vec3 toLocation)
+void dae::HallwaysComponent::DigRight(const glm::vec3& fromLocation, const glm::vec3& toLocation)
 {
 	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
 	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
@@ -173,7 +173,7 @@ void dae::HallwaysComponent::DigRight(const glm::vec3 fromLocation, const glm::v
 	}
 }
 
-void dae::HallwaysComponent::DigLeft(const glm::vec3 fromLocation, const glm::vec3 toLocation)
+void dae::HallwaysComponent::DigLeft(const glm::vec3& fromLocation, const glm::vec3& toLocation)
 {
 	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
 	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
@@ -209,7 +209,7 @@ void dae::HallwaysComponent::DigLeft(const glm::vec3 fromLocation, const glm::ve
 	}
 }
 
-void dae::HallwaysComponent::DigUp(const glm::vec3 fromLocation, const glm::vec3 toLocation)
+void dae::HallwaysComponent::DigUp(const glm::vec3& fromLocation, const glm::vec3& toLocation)
 {
 	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
 	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));
@@ -247,7 +247,7 @@ void dae::HallwaysComponent::DigUp(const glm::vec3 fromLocation, const glm::vec3
 	}
 }
 
-void dae::HallwaysComponent::DigDown(const glm::vec3 fromLocation, const glm::vec3 toLocation)
+void dae::HallwaysComponent::DigDown(const glm::vec3& fromLocation, const glm::vec3& toLocation)
 {
 	auto toYIndex = static_cast<_int64>(std::round(toLocation.y / 16));
 	auto toXIndex = static_cast<_int64>(std::round(toLocation.x / 16));

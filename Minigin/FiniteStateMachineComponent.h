@@ -27,10 +27,10 @@ namespace dae {
 		//void AddState(std::string name, State& state);
 		//void AddCondition(std::string name, Condition& condition);
 		void SetCurrentState(State* state);
-		State* GetState(std::string name);
-		Condition* GetCondition(std::string name);
-		void RemoveState(std::string name);
-		void RemoveCondition(std::string name);
+		State* GetState(const std::string& name);
+		Condition* GetCondition(const std::string& name);
+		void RemoveState(const std::string& name);
+		void RemoveCondition(const std::string& name);
 		void Update() override;
 		float GetTimeInCurrentSituation();
 		void SetTimeInCurrentSituation(float time);

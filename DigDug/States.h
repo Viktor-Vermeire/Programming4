@@ -20,7 +20,7 @@ namespace dae{
 	class Running : public State
 	{
     public:
-        Running(std::vector<SDL_Rect> animationLocations, float timePerFrame);
+        Running(const std::vector<SDL_Rect>& animationLocations, float timePerFrame);
 		void Enter(GameObject* gameObject) override;
 		void Execute(GameObject* gameObject) override;
 		void Exit(GameObject* gameObject) override;
@@ -33,7 +33,7 @@ namespace dae{
     class FloatingToPlayer : public State
     {
     public:
-        FloatingToPlayer(std::vector<SDL_Rect> animationLocations, float timePerFrame);
+        FloatingToPlayer(const std::vector<SDL_Rect>& animationLocations, float timePerFrame);
         void Enter(GameObject*) override;
         void Execute(GameObject* gameObject) override;
         void Exit(GameObject*) override;
@@ -46,7 +46,7 @@ namespace dae{
 
     class FloatingToGrid : public State {
     public:
-        FloatingToGrid(std::vector<SDL_Rect> animationLocations, float timePerFrame);
+        FloatingToGrid(const std::vector<SDL_Rect>& animationLocations, float timePerFrame);
         void Enter(GameObject*) override;
         void Execute(GameObject* gameObject) override;
         void Exit(GameObject*) override;
